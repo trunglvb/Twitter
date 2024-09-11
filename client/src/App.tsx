@@ -1,13 +1,8 @@
-import useRouteElement from './hooks/useRouteElement'
+import useRouteElement from "./hooks/useRouteElement";
 
 function App() {
-  const routeElement = useRouteElement()
-  return (
-    <>
-      {routeElement}
-      <div className='text-red-600'>JIRA TEST</div>
-    </>
-  )
+	const routeElement = useRouteElement();
+	return <div>{routeElement}</div>;
 }
 
-export default App
+export default App;
