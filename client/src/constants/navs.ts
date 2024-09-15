@@ -6,6 +6,7 @@ import {
 	CircleSlash,
 	User,
 	CircleEllipsis,
+	Bookmark,
 } from "lucide-react";
 
 export const sideBarNavs = [
@@ -37,6 +38,12 @@ export const sideBarNavs = [
 		title: "Grok",
 		icon: CircleSlash,
 		path: "/grok",
+		variant: "ghost",
+	},
+	{
+		title: "Bookmarks",
+		icon: Bookmark,
+		path: "/bookmarks",
 		variant: "ghost",
 	},
 	{
