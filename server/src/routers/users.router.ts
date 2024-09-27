@@ -7,4 +7,3 @@ usersRouter.post('/login', loginValidator, loginController);
 usersRouter.post('/register', registerController);
 
 export default usersRouter;
-// mongodb+srv://levubaotrung0311:GReZoR8XP6iMur72@twitter.6nmgf.mongodb.net/
