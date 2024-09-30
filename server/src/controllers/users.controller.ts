@@ -13,11 +13,12 @@ const loginController = (req: Request, res: Response) => {
 };
 
 const registerController = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     const result = await databaseService.users.insertOne(
       new User({
+        name,
         email,
         password
       })

@@ -8,7 +8,7 @@ enum UserVerifyStatus {
 
 interface IUserType {
   _id?: ObjectId;
-  name?: string;
+  name: string;
   email: string;
   date_of_birth?: Date;
   password: string;
@@ -49,7 +49,7 @@ export default class User {
   constructor(user: IUserType) {
     const initDate = new Date();
     this._id = user._id;
-    this.name = user.name ?? '';
+    this.name = user.name;
     this.email = user.email;
     this.date_of_birth = user.date_of_birth ?? initDate;
     this.password = user.password;
