@@ -1,3 +1,4 @@
+import userService from '@/services/user.services';
 import validate from '@/utils/validation';
 import { Request, Response, NextFunction } from 'express';
 import { checkSchema } from 'express-validator';
@@ -31,7 +32,16 @@ const registerValidator = validate(
       isEmail: {
         errorMessage: 'Invalid email format'
       },
-      trim: true
+      trim: true,
+      custom: {
+        options: async (value) => {
+          const isExistEmail = await userService.checkEmailExist(value);
+          if (isExistEmail) {
+            throw new Error('Email already exist');
+          }
+          return true;
+        }
+      }
     },
     password: {
       notEmpty: {
@@ -62,7 +72,7 @@ const registerValidator = validate(
     date_of_birth: {
       isISO8601: {
         options: { strict: true, strictSeparator: true },
-        errorMessage: 'Date of birth must be a valid ISO 8601 date (e.g., YYYY-MM-DD)'
+        errorMessage: 'Date of birth must be a valid ISO 8601 date'
       }
     }
   })
