@@ -1,21 +1,22 @@
+import { IRegisterRequestBody } from '@/models/requests/user.request';
 import User from '@/models/schemas/users.schema';
 import databaseService from '@/services/database.services';
+import { hashPassword } from '@/utils/crypto';
 
 class UsersService {
-  async register(payload: { email: string; password: string; name?: string }) {
-    const { email, password, name } = payload;
+  async register(payload: IRegisterRequestBody) {
     const result = await databaseService.users.insertOne(
       new User({
-        name,
-        email,
-        password
+        ...payload,
+        date_of_birth: new Date(payload.date_of_birth),
+        password: hashPassword(payload.password)
       })
     );
     return result;
   }
   async checkEmailExist(email: string) {
-    const user = databaseService.users.findOne({ email });
-    console.log('user', user);
+    const user = await databaseService.users.findOne({ email });
+    console.log(user);
     return Boolean(user);
   }
 }

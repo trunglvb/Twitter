@@ -1,7 +1,7 @@
-import User from '@/models/schemas/users.schema';
-import databaseService from '@/services/database.services';
+import { ParamsDictionary } from 'express-serve-static-core';
 import userService from '@/services/user.services';
 import { Request, Response } from 'express';
+import { IRegisterRequestBody } from '@/models/requests/user.request';
 
 const loginController = (req: Request, res: Response) => {
   res.json({
@@ -13,13 +13,12 @@ const loginController = (req: Request, res: Response) => {
   });
 };
 
-const registerController = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
-
+const registerController = async (req: Request<ParamsDictionary, any, IRegisterRequestBody>, res: Response) => {
+  const { body } = req;
   try {
-    const result = await userService.register({ email, password, name });
-    return res.json({
-      noti: 'success',
+    const result = await userService.register(body);
+    return res.status(200).json({
+      message: 'Register success',
       result: result
     });
   } catch (error) {

@@ -4,6 +4,7 @@ const app = express();
 const port = 4000;
 import dotenv from 'dotenv';
 import databaseService from '@/services/database.services';
+import userService from '@/services/user.services';
 
 dotenv.config();
 app.use(express.json()); // parse sang dang json de xu ly body gui len
