@@ -1,4 +1,4 @@
-import { UserVerifyStatus } from '@/constants/enums';
+import { EUserVerifyStatus } from '@/constants/enums';
 import { ObjectId } from 'mongodb';
 
 interface IUserType {
@@ -11,7 +11,7 @@ interface IUserType {
   updated_at?: Date;
   email_verify_token?: string; //jwt hoac "" neu da xac thuc
   forgot_password_token?: string; //jwt hoac "" neu da xac thuc
-  verify?: UserVerifyStatus;
+  verify?: EUserVerifyStatus;
   filePath?: string;
 
   //optional
@@ -32,7 +32,7 @@ export default class User {
   updated_at: Date;
   email_verify_token: string;
   forgot_password_token: string;
-  verify: UserVerifyStatus;
+  verify: EUserVerifyStatus;
   filePath: string;
   bio: string;
   location: string;
@@ -52,7 +52,7 @@ export default class User {
     this.updated_at = user.updated_at ?? initDate;
     this.email_verify_token = user.email_verify_token ?? '';
     this.forgot_password_token = user.forgot_password_token ?? '';
-    this.verify = user.verify ?? UserVerifyStatus.Unverified;
+    this.verify = user.verify ?? EUserVerifyStatus.Unverified;
     this.filePath = user.filePath ?? '';
     this.bio = user.bio ?? '';
     this.location = user.location ?? '';

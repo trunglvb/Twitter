@@ -1,6 +1,17 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-const signToken = (payload: any, privateKey: string, options: jwt.SignOptions) => {
+dotenv.config();
+interface ISignToken {
+  payload: string | Buffer | object;
+  privateKey?: string;
+  options?: jwt.SignOptions;
+}
+const signToken = ({
+  payload,
+  privateKey = process.env.JWT_SECRET as string,
+  options = { algorithm: 'HS256' }
+}: ISignToken) => {
   return new Promise<string>((resolve, _reject) => {
     jwt.sign(payload, privateKey, options, (error, token) => {
       if (error) {
@@ -10,3 +21,5 @@ const signToken = (payload: any, privateKey: string, options: jwt.SignOptions) =
     });
   });
 };
+
+export { signToken };

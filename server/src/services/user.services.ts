@@ -1,10 +1,33 @@
+import { ETokenType } from '@/constants/enums';
 import { IRegisterRequestBody } from '@/models/requests/user.request';
 import User from '@/models/schemas/users.schema';
 import databaseService from '@/services/database.services';
 import { hashPassword } from '@/utils/crypto';
-
+import { signToken } from '@/utils/jwt';
+import { config } from 'dotenv';
+config();
 class UsersService {
-  async register(payload: IRegisterRequestBody) {
+  private signAccessToken = async (user_id: string) =>
+    signToken({
+      payload: {
+        user_id,
+        token_type: ETokenType.AccessToken
+      },
+      options: {
+        expiresIn: process.env.ACCESS_TOKEN_EXPRIRE_IN
+      }
+    });
+  private signRefreshToken = async (user_id: string) =>
+    signToken({
+      payload: {
+        user_id,
+        token_type: ETokenType.RefreshToken
+      },
+      options: {
+        expiresIn: process.env.REFRESH_TOKEN_EXPRIRE_IN
+      }
+    });
+  register = async (payload: IRegisterRequestBody) => {
     const result = await databaseService.users.insertOne(
       new User({
         ...payload,
@@ -12,13 +35,18 @@ class UsersService {
         password: hashPassword(payload.password)
       })
     );
-    return result;
-  }
-  async checkEmailExist(email: string) {
+    const user_id = result.insertedId.toString();
+    const [accessToken, refreshToken] = await Promise.all([
+      this.signAccessToken(user_id),
+      this.signRefreshToken(user_id)
+    ]);
+    // const user = await databaseService.users.findOne({ _id: result.insertedId });
+    return { accessToken, refreshToken };
+  };
+  checkEmailExist = async (email: string) => {
     const user = await databaseService.users.findOne({ email });
-    console.log(user);
     return Boolean(user);
-  }
+  };
 }
 
 const userService = new UsersService();

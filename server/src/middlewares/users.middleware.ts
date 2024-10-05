@@ -48,7 +48,7 @@ const registerValidator = validate(
         errorMessage: 'Password cannot be empty'
       },
       isLength: {
-        options: { min: 6, max: 8 },
+        options: { min: 6, max: 100 },
         errorMessage: 'Password must be between 6 and 8 characters'
       },
       isStrongPassword: {
@@ -61,7 +61,7 @@ const registerValidator = validate(
         errorMessage: 'Confirm password cannot be empty'
       },
       isLength: {
-        options: { min: 6, max: 20 },
+        options: { min: 6, max: 100 },
         errorMessage: 'Confirm password must be between 6 and 20 characters'
       },
       custom: {
