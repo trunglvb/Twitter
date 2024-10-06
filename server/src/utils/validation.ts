@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, validationResult, ContextRunner } from 'express-validator';
+import { ContextRunner } from 'express-validator';
 
 // can be reused by many routes
 const validate = (validations: ContextRunner[]) => {

@@ -19,15 +19,11 @@ const registerController = async (
   next: NextFunction
 ) => {
   const { body } = req;
-  try {
-    const result = await userService.register(body);
-    return res.status(200).json({
-      message: 'Register success',
-      result: result
-    });
-  } catch (error) {
-    next(error);
-  }
+  const result = await userService.register(body);
+  return res.status(200).json({
+    message: 'Register success',
+    result: result
+  });
 };
 
 export { loginController, registerController };
