@@ -7,7 +7,7 @@ import { signToken } from '@/utils/jwt';
 import { config } from 'dotenv';
 config();
 class UsersService {
-  private signAccessToken = async (user_id: string) =>
+  private readonly signAccessToken = async (user_id: string) =>
     signToken({
       payload: {
         user_id,
@@ -17,7 +17,7 @@ class UsersService {
         expiresIn: process.env.ACCESS_TOKEN_EXPRIRE_IN
       }
     });
-  private signRefreshToken = async (user_id: string) =>
+  private readonly signRefreshToken = async (user_id: string) =>
     signToken({
       payload: {
         user_id,

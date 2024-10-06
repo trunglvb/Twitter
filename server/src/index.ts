@@ -6,11 +6,15 @@ import dotenv from 'dotenv';
 import databaseService from '@/services/database.services';
 
 dotenv.config();
+databaseService.connect().catch(console.dir);
 app.use(express.json()); // parse sang dang json de xu ly body gui len
-app.use('/users', usersRouter);
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+//error handler
+app.use((err, _req, res, _next) => {
+  res.status(400).json({
+    error: err.message
+  });
 });
 
-databaseService.connect().catch(console.dir);
+//route
+app.use('/users', usersRouter);
