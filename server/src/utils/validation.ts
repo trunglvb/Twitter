@@ -1,30 +1,32 @@
 import { HttpStatusCode } from '@/constants/enums';
 import { EntityError, ErrorResponse, ErrorWithStatus } from '@/utils/errors';
 import express from 'express';
-import { ContextRunner, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 
 // can be reused by many routes
 const validate = (validations: any) => {
   return async (req: express.Request, _res: express.Response, next: express.NextFunction) => {
-    const entityError = new EntityError({ errors: {} });
-    // Chạy tuần tự tất cả các validations
-    for (const validation of validations) {
-      await validation.run(req);
-    }
-    // lấy tất cả các lỗi sau khi chạy xong tất cả validations
+    await validations.run(req);
+
+    // lấy tất cả các lỗi sau khi chạy xong validations
     const errors = validationResult(req);
     const errorObject = errors.mapped();
-    for (let key in errorObject) {
+
+    // khong co loi thi chay tiep
+    if (errors.isEmpty()) {
+      return next();
+    }
+    const entityError = new EntityError({ errors: {} });
+    for (const key in errorObject) {
       const msg = errorObject[key].msg;
+      //neu loi khac 422, next den loi do
       if (msg instanceof ErrorWithStatus && msg.status !== HttpStatusCode.UnprocessableEntity) {
-        return next(errorObject); //next den file index.ts, su dung app.use, msg se la tham so err trong callback (err, req, res, next)
+        return next(msg); //next den file index.ts, su dung app.use, msg se la tham so err trong callback (err, req, res, next)
       }
+      //entity error co message va status default khi tao class la 422
       entityError.errors[key] = errorObject[key] as ErrorResponse;
     }
-    if (!errors.isEmpty()) {
-      return next(entityError);
-    }
-    next();
+    next(entityError);
   };
 };
 

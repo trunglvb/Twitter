@@ -47,6 +47,11 @@ class UsersService {
     const user = await databaseService.users.findOne({ email });
     return Boolean(user);
   };
+  comparePassword = async (email: string, password: string) => {
+    const user = await databaseService.users.findOne({ email });
+    const isCorrectPassword = hashPassword(password) === user?.password;
+    return isCorrectPassword;
+  };
 }
 
 const userService = new UsersService();
