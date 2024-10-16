@@ -6,8 +6,8 @@ dotenv.config();
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter.6nmgf.mongodb.net/`;
 
 class DatabaseService {
-  private client: MongoClient;
-  private db: Db;
+  private readonly client: MongoClient;
+  private readonly db: Db;
   constructor() {
     this.client = new MongoClient(uri);
     this.db = this.client.db(`${process.env.DB_NAME}`);

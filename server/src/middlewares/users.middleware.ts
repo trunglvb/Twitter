@@ -1,6 +1,6 @@
+import databaseService from '@/services/database.services';
 import userService from '@/services/user.services';
 import validate from '@/utils/validation';
-import { Request, Response, NextFunction } from 'express';
 import { checkSchema } from 'express-validator';
 
 const loginValidator = validate(
@@ -14,11 +14,12 @@ const loginValidator = validate(
       },
       trim: true,
       custom: {
-        options: async (value) => {
-          const isExistEmail = await userService.checkEmailExist(value);
-          if (!isExistEmail) {
+        options: async (value, { req }) => {
+          const user = await databaseService.users.findOne({ email: value });
+          if (!user) {
             throw new Error('Email address does not exist');
           }
+          req.user = user;
           return true;
         }
       }

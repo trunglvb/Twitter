@@ -5,6 +5,7 @@ import databaseService from '@/services/database.services';
 import { hashPassword } from '@/utils/crypto';
 import { signToken } from '@/utils/jwt';
 import { config } from 'dotenv';
+import { ObjectId } from 'mongodb';
 config();
 class UsersService {
   private readonly signAccessToken = async (user_id: string) =>
@@ -42,6 +43,15 @@ class UsersService {
     ]);
     // const user = await databaseService.users.findOne({ _id: result.insertedId });
     return { accessToken, refreshToken };
+  };
+  login = async (user: User) => {
+    const { _id } = user;
+    console.log('_id', _id);
+    const [accessToken, refreshToken] = await Promise.all([
+      this.signAccessToken(_id?.toString() as string),
+      this.signRefreshToken(_id?.toString() as string)
+    ]);
+    return { accessToken, refreshToken, user };
   };
   checkEmailExist = async (email: string) => {
     const user = await databaseService.users.findOne({ email });
