@@ -1,11 +1,13 @@
 import { ETokenType } from '@/constants/enums';
 import { IRegisterRequestBody } from '@/models/requests/user.request';
+import RefreshTokens from '@/models/schemas/refreshTokens.schema';
 import User from '@/models/schemas/users.schema';
 import databaseService from '@/services/database.services';
 import { hashPassword } from '@/utils/crypto';
 import { signToken } from '@/utils/jwt';
 import { config } from 'dotenv';
 import { ObjectId } from 'mongodb';
+
 config();
 class UsersService {
   private readonly signAccessToken = async (user_id: string) =>
@@ -36,31 +38,36 @@ class UsersService {
         password: hashPassword(payload.password)
       })
     );
-    const user_id = result.insertedId.toString();
+    const user_id = result.insertedId;
     const [accessToken, refreshToken] = await Promise.all([
-      this.signAccessToken(user_id),
-      this.signRefreshToken(user_id)
+      this.signAccessToken(user_id.toString()),
+      this.signRefreshToken(user_id.toString())
     ]);
-    // const user = await databaseService.users.findOne({ _id: result.insertedId });
+    await databaseService.refreshTokens.insertOne(
+      new RefreshTokens({
+        token: refreshToken,
+        user_id: user_id
+      })
+    );
     return { accessToken, refreshToken };
   };
   login = async (user: User) => {
     const { _id } = user;
-    console.log('_id', _id);
     const [accessToken, refreshToken] = await Promise.all([
       this.signAccessToken(_id?.toString() as string),
       this.signRefreshToken(_id?.toString() as string)
     ]);
+    await databaseService.refreshTokens.insertOne(
+      new RefreshTokens({
+        token: refreshToken,
+        user_id: _id as ObjectId
+      })
+    );
     return { accessToken, refreshToken, user };
   };
   checkEmailExist = async (email: string) => {
     const user = await databaseService.users.findOne({ email });
     return Boolean(user);
-  };
-  comparePassword = async (email: string, password: string) => {
-    const user = await databaseService.users.findOne({ email });
-    const isCorrectPassword = hashPassword(password) === user?.password;
-    return isCorrectPassword;
   };
 }
 

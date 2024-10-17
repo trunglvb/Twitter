@@ -1,6 +1,7 @@
 import { Collection, Db, MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 import User from '@/models/schemas/users.schema';
+import RefreshTokens from '@/models/schemas/refreshTokens.schema';
 dotenv.config();
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter.6nmgf.mongodb.net/`;
@@ -29,6 +30,9 @@ class DatabaseService {
   //getter, truy cap gia trị của db collection ở nơi khác bằng cách sử dụng databaseService.users
   get users(): Collection<User> {
     return this.db.collection('users');
+  }
+  get refreshTokens(): Collection<RefreshTokens> {
+    return this.db.collection('refreshToken');
   }
 }
 

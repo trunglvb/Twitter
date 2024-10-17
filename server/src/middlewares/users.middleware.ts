@@ -1,5 +1,6 @@
 import databaseService from '@/services/database.services';
 import userService from '@/services/user.services';
+import { hashPassword } from '@/utils/crypto';
 import validate from '@/utils/validation';
 import { checkSchema } from 'express-validator';
 
@@ -15,9 +16,9 @@ const loginValidator = validate(
       trim: true,
       custom: {
         options: async (value, { req }) => {
-          const user = await databaseService.users.findOne({ email: value });
+          const user = await databaseService.users.findOne({ email: value, password: hashPassword(req.body.password) });
           if (!user) {
-            throw new Error('Email address does not exist');
+            throw new Error('Email or password is incorrect');
           }
           req.user = user;
           return true;
@@ -35,16 +36,6 @@ const loginValidator = validate(
       isStrongPassword: {
         options: { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 },
         errorMessage: 'Password must be strong (at least one lowercase, one uppercase, one number, and one symbol)'
-      },
-      custom: {
-        options: async (value, { req }) => {
-          const { email } = req.body;
-          const isCorrectPassword = await userService.comparePassword(email, value);
-          if (!isCorrectPassword) {
-            throw new Error('Incorrect password');
-          }
-          return true;
-        }
       }
     }
   })
