@@ -1,9 +1,14 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
 interface ISignToken {
   payload: string | Buffer | object;
+  privateKey?: string;
+  options?: jwt.SignOptions;
+}
+interface IVerifyToken {
+  token: string;
   privateKey?: string;
   options?: jwt.SignOptions;
 }
@@ -22,4 +27,15 @@ const signToken = ({
   });
 };
 
-export { signToken };
+const verifyToken = ({ token, privateKey = process.env.JWT_SECRET as string }: IVerifyToken) => {
+  return new Promise<JwtPayload>((resolve, _reject) => {
+    jwt.verify(token, privateKey, (error, decoded) => {
+      if (error) {
+        throw error;
+      }
+      resolve(decoded as JwtPayload);
+    });
+  });
+};
+
+export { signToken, verifyToken };
