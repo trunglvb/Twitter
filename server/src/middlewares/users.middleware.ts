@@ -6,6 +6,7 @@ import { ErrorWithStatus } from '@/utils/errors';
 import { verifyToken } from '@/utils/jwt';
 import validate from '@/utils/validation';
 import { checkSchema } from 'express-validator';
+import { JsonWebTokenError } from 'jsonwebtoken';
 
 const loginValidator = validate(
   checkSchema(
@@ -123,7 +124,7 @@ const accessTokenValidator = validate(
     {
       Authorization: {
         notEmpty: {
-          errorMessage: 'Access Token is require'
+          errorMessage: 'Access Token is required'
         },
         custom: {
           options: async (value: string, { req }) => {
@@ -131,7 +132,7 @@ const accessTokenValidator = validate(
             if (!accessToken) {
               throw new ErrorWithStatus({ status: HttpStatusCode.Unauthorized, message: 'Token is invalid' });
             }
-            const decodeAuthorization = verifyToken({ token: accessToken });
+            const decodeAuthorization = await verifyToken({ token: accessToken });
             req.decodeAuthorization = decodeAuthorization;
             return true;
           }
@@ -141,4 +142,44 @@ const accessTokenValidator = validate(
     ['headers']
   )
 );
-export { loginValidator, registerValidator, accessTokenValidator };
+
+const refreshTokenValidator = validate(
+  checkSchema(
+    {
+      refresh_token: {
+        notEmpty: {
+          errorMessage: 'Refresh token is required'
+        },
+        custom: {
+          options: async (value: string, { req }) => {
+            try {
+              const [decodeAuthorization, refreshToken] = await Promise.all([
+                verifyToken({ token: value }),
+                databaseService.refreshTokens.findOne({ token: value })
+              ]);
+              if (refreshToken == null) {
+                throw new ErrorWithStatus({
+                  status: HttpStatusCode.Unauthorized,
+                  message: 'Refresh token does not exits'
+                });
+              }
+              req.decodeAuthorization = decodeAuthorization;
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: 'Refresh token is invalid',
+                  status: HttpStatusCode.Unauthorized
+                });
+              }
+              throw error;
+            }
+            return true;
+          }
+        }
+      }
+    },
+    ['body']
+  )
+);
+
+export { loginValidator, registerValidator, accessTokenValidator, refreshTokenValidator };

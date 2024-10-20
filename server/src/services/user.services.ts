@@ -65,6 +65,9 @@ class UsersService {
     );
     return { accessToken, refreshToken, user };
   };
+  logout = async (refresh_token: string) => {
+    await databaseService.refreshTokens.deleteOne({ token: refresh_token });
+  };
   checkEmailExist = async (email: string) => {
     const user = await databaseService.users.findOne({ email });
     return Boolean(user);
