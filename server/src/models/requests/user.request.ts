@@ -6,4 +6,11 @@ type IRegisterRequestBody = {
   date_of_birth: string;
 };
 
-export { IRegisterRequestBody };
+type ITokenPayload = {
+  user_id: string;
+  token_type: number;
+  iat: number;
+  exp: number;
+};
+
+export { IRegisterRequestBody, ITokenPayload };

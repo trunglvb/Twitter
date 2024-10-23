@@ -1,6 +1,7 @@
 import { loginController, logoutController, registerController } from '@/controllers/users.controller';
 import {
   accessTokenValidator,
+  emailVerifyTokenValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator
@@ -14,5 +15,8 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
 
 //logout (can headers: Beare accessToken, body: refreshToken)
 usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController));
+
+//verify email when user click in the email
+usersRouter.post('/verify-email', emailVerifyTokenValidator);
 
 export default usersRouter;

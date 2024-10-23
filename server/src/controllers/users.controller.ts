@@ -5,6 +5,8 @@ import { IRegisterRequestBody } from '@/models/requests/user.request';
 import User from '@/models/schemas/users.schema';
 import { HttpStatusCode } from '@/constants/enums';
 import databaseService from '@/services/database.services';
+import { ObjectId } from 'mongodb';
+import { ErrorWithStatus } from '@/utils/errors';
 
 type ILoginBody = Pick<IRegisterRequestBody, 'email' | 'password'>;
 
@@ -42,4 +44,21 @@ const logoutController = async (
   });
 };
 
-export { loginController, registerController, logoutController };
+const emailVerifyTokenController = async (req: Request, res: Response, _next: NextFunction) => {
+  const { user_id } = req.decode_email_verify_token!;
+  const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) });
+  if (!user) {
+    throw new ErrorWithStatus({
+      status: HttpStatusCode.NotFound,
+      message: 'User not found'
+    });
+  }
+  //neu verify roi thi ko bao loi ma tra ve thong bao da verify
+  if (user?.email_verify_token === '') {
+    res.status(HttpStatusCode.Ok).json({
+      message: 'Email already verified'
+    });
+  }
+};
+
+export { loginController, registerController, logoutController, emailVerifyTokenController };

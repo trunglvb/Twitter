@@ -16,6 +16,7 @@ class UsersService {
         user_id,
         token_type: ETokenType.AccessToken
       },
+      privateKey: process.env.JWT_SECRET as string,
       options: {
         expiresIn: process.env.ACCESS_TOKEN_EXPRIRE_IN
       }
@@ -26,6 +27,7 @@ class UsersService {
         user_id,
         token_type: ETokenType.RefreshToken
       },
+      privateKey: process.env.JWT_SECRET_REFRESHTOKEN as string,
       options: {
         expiresIn: process.env.REFRESH_TOKEN_EXPRIRE_IN
       }
@@ -71,6 +73,18 @@ class UsersService {
   checkEmailExist = async (email: string) => {
     const user = await databaseService.users.findOne({ email });
     return Boolean(user);
+  };
+  verifyEmail = async (user_id: string) => {
+    const result = await databaseService.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          email_verify_token: '',
+          updated_at: new Date()
+        }
+      }
+    );
+    console.log(result);
   };
 }
 

@@ -7,7 +7,9 @@ import { verifyToken } from '@/utils/jwt';
 import validate from '@/utils/validation';
 import { checkSchema } from 'express-validator';
 import { JsonWebTokenError } from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const loginValidator = validate(
   checkSchema(
     {
@@ -123,16 +125,23 @@ const accessTokenValidator = validate(
   checkSchema(
     {
       Authorization: {
-        notEmpty: {
-          errorMessage: 'Access Token is required'
-        },
+        trim: true,
         custom: {
           options: async (value: string, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                status: HttpStatusCode.Unauthorized,
+                message: 'Access token is required'
+              });
+            }
             const accessToken = value?.split(' ')[1];
             if (!accessToken) {
               throw new ErrorWithStatus({ status: HttpStatusCode.Unauthorized, message: 'Token is invalid' });
             }
-            const decodeAuthorization = await verifyToken({ token: accessToken });
+            const decodeAuthorization = await verifyToken({
+              token: accessToken,
+              privateKey: process.env.JWT_SECRET as string
+            });
             req.decodeAuthorization = decodeAuthorization;
             return true;
           }
@@ -147,14 +156,18 @@ const refreshTokenValidator = validate(
   checkSchema(
     {
       refresh_token: {
-        notEmpty: {
-          errorMessage: 'Refresh token is required'
-        },
+        trim: true,
         custom: {
           options: async (value: string, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                status: HttpStatusCode.Unauthorized,
+                message: 'Refresh token is required'
+              });
+            }
             try {
-              const [decodeAuthorization, refreshToken] = await Promise.all([
-                verifyToken({ token: value }),
+              const [decode_refresh_token, refreshToken] = await Promise.all([
+                verifyToken({ token: value, privateKey: process.env.JWT_SECRET_REFRESHTOKEN as string }),
                 databaseService.refreshTokens.findOne({ token: value })
               ]);
               if (refreshToken == null) {
@@ -163,7 +176,8 @@ const refreshTokenValidator = validate(
                   message: 'Refresh token does not exits'
                 });
               }
-              req.decodeAuthorization = decodeAuthorization;
+              console.log('decode_refresh_token', decode_refresh_token);
+              req.decode_refresh_token = decode_refresh_token;
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
@@ -182,4 +196,41 @@ const refreshTokenValidator = validate(
   )
 );
 
-export { loginValidator, registerValidator, accessTokenValidator, refreshTokenValidator };
+const emailVerifyTokenValidator = validate(
+  checkSchema(
+    {
+      email_verify_token: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                status: HttpStatusCode.Unauthorized,
+                message: 'Email verify is required'
+              });
+            }
+            try {
+              const decode_email_verify_token = await verifyToken({
+                token: value,
+                privateKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string
+              });
+              req.decode_email_verify_token = decode_email_verify_token;
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: 'Email verify is invalid',
+                  status: HttpStatusCode.Unauthorized
+                });
+              }
+              throw error;
+            }
+            return true;
+          }
+        }
+      }
+    },
+    ['body']
+  )
+);
+
+export { loginValidator, registerValidator, accessTokenValidator, refreshTokenValidator, emailVerifyTokenValidator };
