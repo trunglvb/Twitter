@@ -1,4 +1,9 @@
-import { loginController, logoutController, registerController } from '@/controllers/users.controller';
+import {
+  emailVerifyTokenController,
+  loginController,
+  logoutController,
+  registerController
+} from '@/controllers/users.controller';
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
@@ -17,6 +22,6 @@ usersRouter.post('/register', registerValidator, wrapRequestHandler(registerCont
 usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapRequestHandler(logoutController));
 
 //verify email when user click in the email
-usersRouter.post('/verify-email', emailVerifyTokenValidator);
+usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(emailVerifyTokenController));
 
 export default usersRouter;

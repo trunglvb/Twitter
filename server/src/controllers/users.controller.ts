@@ -55,10 +55,16 @@ const emailVerifyTokenController = async (req: Request, res: Response, _next: Ne
   }
   //neu verify roi thi ko bao loi ma tra ve thong bao da verify
   if (user?.email_verify_token === '') {
-    res.status(HttpStatusCode.Ok).json({
+    return res.status(HttpStatusCode.Ok).json({
       message: 'Email already verified'
     });
   }
+
+  const result = await userService.verifyEmail(user_id);
+  res.status(HttpStatusCode.Ok).json({
+    message: 'Email verified',
+    result
+  });
 };
 
 export { loginController, registerController, logoutController, emailVerifyTokenController };

@@ -218,7 +218,7 @@ const emailVerifyTokenValidator = validate(
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
-                  message: 'Email verify is invalid',
+                  message: 'Email verify token is invalid',
                   status: HttpStatusCode.Unauthorized
                 });
               }
