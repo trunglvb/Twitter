@@ -90,17 +90,16 @@ class UsersService {
   };
   verifyEmail = async (user_id: string) => {
     const [_result, accessToken, refreshToken] = await Promise.all([
-      databaseService.users.updateOne(
-        { _id: new ObjectId(user_id) },
+      databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
         {
           $set: {
             email_verify_token: '',
-            updated_at: new Date()
+            updated_at: '$$NOW' //Mongo db cap nhat gia tri
           }
         }
-      ),
-      this.signAccessToken(user_id?.toString() as string),
-      this.signRefreshToken(user_id?.toString() as string)
+      ]),
+      this.signAccessToken(user_id?.toString()),
+      this.signRefreshToken(user_id?.toString())
     ]);
 
     return { accessToken, refreshToken };
