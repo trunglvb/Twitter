@@ -138,11 +138,24 @@ const accessTokenValidator = validate(
             if (!accessToken) {
               throw new ErrorWithStatus({ status: HttpStatusCode.Unauthorized, message: 'Token is invalid' });
             }
-            const decodeAuthorization = await verifyToken({
-              token: accessToken,
-              privateKey: process.env.JWT_SECRET as string
-            });
-            req.decodeAuthorization = decodeAuthorization;
+            try {
+              const decode_access_token = await verifyToken({
+                token: accessToken,
+                privateKey: process.env.JWT_SECRET as string
+              });
+              req.decode_access_token = decode_access_token;
+              if (decode_access_token == null) {
+                throw new ErrorWithStatus({ status: HttpStatusCode.Unauthorized, message: 'Token is invalid' });
+              }
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: 'Refresh token is invalid',
+                  status: HttpStatusCode.Unauthorized
+                });
+              }
+              throw error;
+            }
             return true;
           }
         }
@@ -176,7 +189,7 @@ const refreshTokenValidator = validate(
                   message: 'Refresh token does not exits'
                 });
               }
-              console.log('decode_refresh_token', decode_refresh_token);
+
               req.decode_refresh_token = decode_refresh_token;
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
