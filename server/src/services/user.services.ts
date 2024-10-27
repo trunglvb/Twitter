@@ -1,4 +1,4 @@
-import { ETokenType } from '@/constants/enums';
+import { ETokenType, EUserVerifyStatus } from '@/constants/enums';
 import { IRegisterRequestBody } from '@/models/requests/user.request';
 import RefreshTokens from '@/models/schemas/refreshTokens.schema';
 import User from '@/models/schemas/users.schema';
@@ -94,15 +94,32 @@ class UsersService {
         {
           $set: {
             email_verify_token: '',
-            updated_at: '$$NOW' //Mongo db cap nhat gia tri
+            updated_at: '$$NOW', //Mongo db cap nhat gia tri,
+            verify: EUserVerifyStatus.Verified
           }
         }
       ]),
       this.signAccessToken(user_id?.toString()),
       this.signRefreshToken(user_id?.toString())
     ]);
-
     return { accessToken, refreshToken };
+  };
+  resendEmailVerify = async (user_id: string) => {
+    //B1: send email
+    const email_verify_token = await this.signEmailVerifyToken(user_id.toString());
+    await databaseService.users.updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      [
+        {
+          $set: {
+            email_verify_token: email_verify_token,
+            updated_at: '$$NOW'
+          }
+        }
+      ]
+    );
   };
 }
 

@@ -24,4 +24,8 @@ usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapReq
 //verify email when user click in the email
 usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(emailVerifyTokenController));
 
+//resend email verify token
+//need login first to can resend email with authorization header
+usersRouter.post('/resend-email-verify-token', accessTokenValidator);
+
 export default usersRouter;

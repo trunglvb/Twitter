@@ -3,7 +3,7 @@ import userService from '@/services/user.services';
 import { NextFunction, Request, Response } from 'express';
 import { IRegisterRequestBody } from '@/models/requests/user.request';
 import User from '@/models/schemas/users.schema';
-import { HttpStatusCode } from '@/constants/enums';
+import { EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
 import databaseService from '@/services/database.services';
 import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
@@ -64,6 +64,28 @@ const emailVerifyTokenController = async (req: Request, res: Response, _next: Ne
   res.status(HttpStatusCode.Ok).json({
     message: 'Email verified',
     result
+  });
+};
+
+export const resendEmailVerifyController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decode_access_token!;
+  const user = await databaseService.users.findOne({
+    _id: new ObjectId(user_id)
+  });
+  if (!user) {
+    throw new ErrorWithStatus({
+      status: HttpStatusCode.NotFound,
+      message: 'User not found'
+    });
+  }
+  if (user?.verify === EUserVerifyStatus.Verified) {
+    return res.json({
+      message: 'Email already verified'
+    });
+  }
+  await userService.resendEmailVerify(user_id);
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'Resend email verify success'
   });
 };
 
