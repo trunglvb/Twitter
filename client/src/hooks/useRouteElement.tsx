@@ -1,6 +1,6 @@
 import path from "@/constants/path";
 import MainLayout from "@/layouts";
-import Home from "@/pages/home";
+
 import { useRoutes } from "react-router-dom";
 
 const useRouteElement = () => {

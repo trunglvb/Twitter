@@ -2,7 +2,8 @@ import {
   emailVerifyTokenController,
   loginController,
   logoutController,
-  registerController
+  registerController,
+  resendEmailVerifyController
 } from '@/controllers/users.controller';
 import {
   accessTokenValidator,
@@ -26,6 +27,6 @@ usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(
 
 //resend email verify token
 //need login first to can resend email with authorization header
-usersRouter.post('/resend-email-verify-token', accessTokenValidator);
+usersRouter.post('/resend-email-verify-token', accessTokenValidator, resendEmailVerifyController);
 
 export default usersRouter;

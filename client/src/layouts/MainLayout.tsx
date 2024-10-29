@@ -1,4 +1,5 @@
 import LeftNav from "@/components/leftnav";
+import TreeSelectExample from "@/pages/home/treeSelect";
 
 const MainLayout = () => {
 	return (
@@ -14,7 +15,9 @@ const MainLayout = () => {
 					</div>
 					<div className="col-span-7">
 						<div className="grid grid-cols-7">
-							<div className="col-span-4">4</div>
+							<div className="col-span-4">
+								<TreeSelectExample />
+							</div>
 							<div className="col-span-3">3</div>
 						</div>
 					</div>
