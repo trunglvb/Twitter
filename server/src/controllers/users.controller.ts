@@ -9,6 +9,9 @@ import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
 
 type ILoginBody = Pick<IRegisterRequestBody, 'email' | 'password'>;
+type IForgotPasswordBody = {
+  email: string;
+};
 
 const loginController = async (req: Request<ParamsDictionary, any, ILoginBody>, res: Response, _next: NextFunction) => {
   const { user } = req;
@@ -89,4 +92,16 @@ export const resendEmailVerifyController = async (req: Request, res: Response, n
   });
 };
 
-export { loginController, registerController, logoutController, emailVerifyTokenController };
+const forgotPasswordController = async (
+  req: Request<ParamsDictionary, any, IForgotPasswordBody>,
+  res: Response,
+  _next: NextFunction
+) => {
+  const { user } = req;
+  await userService.updateForgotPasswordToken(user as User);
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'Forgot password token updated'
+  });
+};
+
+export { loginController, registerController, logoutController, emailVerifyTokenController, forgotPasswordController };

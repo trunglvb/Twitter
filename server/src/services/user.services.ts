@@ -43,6 +43,17 @@ class UsersService {
         expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPRIE_IN
       }
     });
+  signForgotPasswordToken = async (user_id: string) =>
+    signToken({
+      payload: {
+        user_id,
+        token_type: ETokenType.ForgotPasswordToken
+      },
+      privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD_VERIFY_TOKEN as string,
+      options: {
+        expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPRIE_IN
+      }
+    });
   register = async (payload: IRegisterRequestBody) => {
     const user_id = new ObjectId();
     const emailVerifyToken = await this.signEmailVerifyToken(user_id.toString());
@@ -120,6 +131,26 @@ class UsersService {
         }
       ]
     );
+  };
+  updateForgotPasswordToken = async (user: User) => {
+    const { _id } = user;
+    const forgot_password_token = await this.signForgotPasswordToken(_id?.toString() as string);
+    await databaseService.users.updateOne(
+      {
+        _id: _id
+      },
+      [
+        {
+          $set: {
+            forgot_password_token: forgot_password_token,
+            updated_at: '$$NOW'
+          }
+        }
+      ]
+    );
+    //send mail kem link duong dan den verify-forgot-password => client se goi post va gui lai forgot_password_token len
+    // https://twiter.com/fotgot-password?token=${token}
+    return true;
   };
 }
 

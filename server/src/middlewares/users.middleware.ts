@@ -246,4 +246,40 @@ const emailVerifyTokenValidator = validate(
   )
 );
 
-export { loginValidator, registerValidator, accessTokenValidator, refreshTokenValidator, emailVerifyTokenValidator };
+const forgotPasswordEmailValidator = validate(
+  checkSchema(
+    {
+      email: {
+        notEmpty: {
+          errorMessage: 'Email cannot be empty'
+        },
+        isEmail: {
+          errorMessage: 'Invalid email format'
+        },
+        trim: true,
+        custom: {
+          options: async (value, { req }) => {
+            const user = await databaseService.users.findOne({
+              email: value
+            });
+            if (!user) {
+              throw new Error('Email is incorrect');
+            }
+            req.user = user;
+            return true;
+          }
+        }
+      }
+    },
+    ['body']
+  )
+);
+
+export {
+  loginValidator,
+  registerValidator,
+  accessTokenValidator,
+  refreshTokenValidator,
+  emailVerifyTokenValidator,
+  forgotPasswordEmailValidator
+};

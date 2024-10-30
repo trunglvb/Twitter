@@ -1,5 +1,7 @@
+import { hashPassword } from '@/utils/crypto';
 import {
   emailVerifyTokenController,
+  forgotPasswordController,
   loginController,
   logoutController,
   registerController,
@@ -8,6 +10,7 @@ import {
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
+  forgotPasswordEmailValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator
@@ -27,6 +30,11 @@ usersRouter.post('/verify-email', emailVerifyTokenValidator, wrapRequestHandler(
 
 //resend email verify token
 //need login first to can resend email with authorization header
-usersRouter.post('/resend-email-verify-token', accessTokenValidator, resendEmailVerifyController);
+usersRouter.post('/resend-email-verify-token', accessTokenValidator, wrapRequestHandler(resendEmailVerifyController));
+
+//forgot hashPassword
+//B1: check email valid to update forgot_password_token
+
+usersRouter.post('/forgot-password', forgotPasswordEmailValidator, wrapRequestHandler(forgotPasswordController));
 
 export default usersRouter;
