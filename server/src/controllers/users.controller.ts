@@ -104,4 +104,21 @@ const forgotPasswordController = async (
   });
 };
 
-export { loginController, registerController, logoutController, emailVerifyTokenController, forgotPasswordController };
+const verifyForgotPasswordTokenController = async (
+  _req: Request<ParamsDictionary, any, { forgot_password_token: string }>,
+  res: Response,
+  _next: NextFunction
+) => {
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'Forgot password token verified'
+  });
+};
+
+export {
+  loginController,
+  registerController,
+  logoutController,
+  emailVerifyTokenController,
+  forgotPasswordController,
+  verifyForgotPasswordTokenController
+};

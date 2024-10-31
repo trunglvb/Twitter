@@ -10,5 +10,6 @@ declare module 'express' {
     decode_refresh_token?: ITokenPayload;
     decode_email_verify_token?: ITokenPayload;
     decode_access_token?: ITokenPayload;
+    decode_forgot_password_token?: ITokenPayload;
   }
 }

@@ -1,16 +1,17 @@
-import { hashPassword } from '@/utils/crypto';
 import {
   emailVerifyTokenController,
   forgotPasswordController,
   loginController,
   logoutController,
   registerController,
-  resendEmailVerifyController
+  resendEmailVerifyController,
+  verifyForgotPasswordTokenController
 } from '@/controllers/users.controller';
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
   forgotPasswordEmailValidator,
+  forgotPasswordTokenValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator
@@ -37,4 +38,10 @@ usersRouter.post('/resend-email-verify-token', accessTokenValidator, wrapRequest
 
 usersRouter.post('/forgot-password', forgotPasswordEmailValidator, wrapRequestHandler(forgotPasswordController));
 
+//verify forgotpassword token
+usersRouter.post(
+  '/verify-forgot-password',
+  forgotPasswordTokenValidator,
+  wrapRequestHandler(verifyForgotPasswordTokenController)
+);
 export default usersRouter;

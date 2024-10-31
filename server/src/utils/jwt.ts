@@ -1,4 +1,5 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { ITokenPayload } from '@/models/requests/user.request';
+import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -24,12 +25,12 @@ const signToken = ({ payload, privateKey, options = { algorithm: 'HS256' } }: IS
 };
 
 const verifyToken = ({ token, privateKey }: IVerifyToken) => {
-  return new Promise<JwtPayload>((resolve, _reject) => {
+  return new Promise<ITokenPayload>((resolve, _reject) => {
     jwt.verify(token, privateKey, (error, decoded) => {
       if (error) {
         throw error;
       }
-      resolve(decoded as JwtPayload);
+      resolve(decoded as ITokenPayload);
     });
   });
 };

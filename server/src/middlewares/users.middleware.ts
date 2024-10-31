@@ -8,6 +8,7 @@ import validate from '@/utils/validation';
 import { checkSchema } from 'express-validator';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { ObjectId } from 'mongodb';
 
 dotenv.config();
 const loginValidator = validate(
@@ -275,11 +276,63 @@ const forgotPasswordEmailValidator = validate(
   )
 );
 
+const forgotPasswordTokenValidator = validate(
+  checkSchema(
+    {
+      forgot_paswsword_token: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                status: HttpStatusCode.Unauthorized,
+                message: 'Forgot password token is required'
+              });
+            }
+            try {
+              const decode_forgot_password_token = await verifyToken({
+                token: value,
+                privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD_VERIFY_TOKEN as string
+              });
+              const { user_id } = decode_forgot_password_token;
+              req.decode_forgot_password_token = decode_forgot_password_token;
+              const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) });
+              if (user == null) {
+                throw new ErrorWithStatus({
+                  status: HttpStatusCode.NotFound,
+                  message: 'User not found'
+                });
+              }
+              if (user?.forgot_password_token !== value) {
+                throw new ErrorWithStatus({
+                  status: HttpStatusCode.Unauthorized,
+                  message: 'Forgot password token is invalid'
+                });
+              }
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: 'Forgot password token is invalid',
+                  status: HttpStatusCode.Unauthorized
+                });
+              }
+              throw error;
+            }
+            return true;
+          }
+        }
+      }
+    },
+    ['body']
+  )
+);
+
 export {
   loginValidator,
   registerValidator,
   accessTokenValidator,
   refreshTokenValidator,
   emailVerifyTokenValidator,
-  forgotPasswordEmailValidator
+  forgotPasswordEmailValidator,
+  forgotPasswordTokenValidator
 };
