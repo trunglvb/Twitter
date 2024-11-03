@@ -113,6 +113,12 @@ class UsersService {
       this.signAccessToken(user_id?.toString()),
       this.signRefreshToken(user_id?.toString())
     ]);
+    await databaseService.refreshTokens.insertOne(
+      new RefreshTokens({
+        token: refreshToken,
+        user_id: new ObjectId(user_id)
+      })
+    );
     return { accessToken, refreshToken };
   };
   resendEmailVerify = async (user_id: string) => {
@@ -151,6 +157,22 @@ class UsersService {
     //send mail kem link duong dan den verify-forgot-password => client se goi post va gui lai forgot_password_token len
     // https://twiter.com/fotgot-password?token=${token}
     return true;
+  };
+  resetPassword = async (user_id: string, new_password: string) => {
+    await databaseService.users.updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      [
+        {
+          $set: {
+            forgot_password_token: '',
+            password: hashPassword(new_password),
+            updated_at: '$$NOW'
+          }
+        }
+      ]
+    );
   };
 }
 

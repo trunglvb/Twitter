@@ -190,7 +190,6 @@ const refreshTokenValidator = validate(
                   message: 'Refresh token does not exits'
                 });
               }
-
               req.decode_refresh_token = decode_refresh_token;
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
@@ -327,6 +326,136 @@ const forgotPasswordTokenValidator = validate(
   )
 );
 
+const resetPasswordValidator = validate(
+  checkSchema(
+    {
+      password: {
+        notEmpty: {
+          errorMessage: 'Password cannot be empty'
+        },
+        isLength: {
+          options: { min: 6, max: 100 },
+          errorMessage: 'Password must be between 6 and 8 characters'
+        },
+        isStrongPassword: {
+          options: { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 },
+          errorMessage: 'Password must be strong (at least one lowercase, one uppercase, one number, and one symbol)'
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const { decode_access_token } = req;
+
+            const { user_id } = decode_access_token;
+            const user = await databaseService.users.findOne({ _id: new ObjectId(user_id as string) });
+            const isMatchPassword = user?.password === hashPassword(value);
+            if (!isMatchPassword) {
+              throw new Error('Password is incorrect');
+            }
+            return true;
+          }
+        }
+      },
+      new_password: {
+        notEmpty: {
+          errorMessage: 'New password cannot be empty'
+        },
+        isLength: {
+          options: { min: 6, max: 100 },
+          errorMessage: 'New password must be between 6 and 8 characters'
+        },
+        isStrongPassword: {
+          options: { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 },
+          errorMessage:
+            'New password must be strong (at least one lowercase, one uppercase, one number, and one symbol)'
+        }
+      },
+      confirm__new_password: {
+        notEmpty: {
+          errorMessage: 'Confirm new password cannot be empty'
+        },
+        isLength: {
+          options: { min: 6, max: 100 },
+          errorMessage: 'Confirm new password must be between 6 and 20 characters'
+        },
+        custom: {
+          options: (value, { req }) => value === req.body.new_password,
+          errorMessage: 'Passwords do not match'
+        }
+      }
+    },
+    ['body']
+  )
+);
+const resetForgotPasswordValidator = validate(
+  checkSchema(
+    {
+      new_password: {
+        notEmpty: {
+          errorMessage: 'New password cannot be empty'
+        },
+        isLength: {
+          options: { min: 6, max: 100 },
+          errorMessage: 'New password must be between 6 and 8 characters'
+        },
+        isStrongPassword: {
+          options: { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 },
+          errorMessage:
+            'New password must be strong (at least one lowercase, one uppercase, one number, and one symbol)'
+        }
+      },
+      confirm_new_password: {
+        notEmpty: {
+          errorMessage: 'Confirm new password cannot be empty'
+        },
+        isLength: {
+          options: { min: 6, max: 100 },
+          errorMessage: 'Confirm new password must be between 6 and 20 characters'
+        },
+        custom: {
+          options: (value, { req }) => value === req.body.new_password,
+          errorMessage: 'Passwords do not match'
+        }
+      },
+      forgot_password_token: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!value) {
+              throw new ErrorWithStatus({
+                status: HttpStatusCode.Unauthorized,
+                message: 'Token is required'
+              });
+            }
+            try {
+              const decode_forgot_password_token = await verifyToken({
+                token: value,
+                privateKey: process.env.JWT_SECRET_FORGOT_PASSWORD_VERIFY_TOKEN as string
+              });
+              if (decode_forgot_password_token == null) {
+                throw new ErrorWithStatus({
+                  status: HttpStatusCode.Unauthorized,
+                  message: 'Token does not exits'
+                });
+              }
+              req.decode_forgot_password_token = decode_forgot_password_token;
+            } catch (error) {
+              if (error instanceof JsonWebTokenError) {
+                throw new ErrorWithStatus({
+                  message: 'Token is invalid',
+                  status: HttpStatusCode.Unauthorized
+                });
+              }
+              throw error;
+            }
+            return true;
+          }
+        }
+      }
+    },
+    ['body']
+  )
+);
+
 export {
   loginValidator,
   registerValidator,
@@ -334,5 +463,7 @@ export {
   refreshTokenValidator,
   emailVerifyTokenValidator,
   forgotPasswordEmailValidator,
-  forgotPasswordTokenValidator
+  forgotPasswordTokenValidator,
+  resetPasswordValidator,
+  resetForgotPasswordValidator
 };

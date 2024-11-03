@@ -7,10 +7,17 @@ import { EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
 import databaseService from '@/services/database.services';
 import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
+import { verifyToken } from '@/utils/jwt';
 
 type ILoginBody = Pick<IRegisterRequestBody, 'email' | 'password'>;
 type IForgotPasswordBody = {
   email: string;
+};
+type IResetPasswordBody = {
+  forgot_password_token: string;
+  password: string;
+  new_password: string;
+  confirm_new_password: string;
 };
 
 const loginController = async (req: Request<ParamsDictionary, any, ILoginBody>, res: Response, _next: NextFunction) => {
@@ -114,11 +121,25 @@ const verifyForgotPasswordTokenController = async (
   });
 };
 
+const resetPasswordController = async (
+  req: Request<ParamsDictionary, any, IResetPasswordBody>,
+  res: Response,
+  _next: NextFunction
+) => {
+  const { user_id } = req.decode_forgot_password_token!;
+  const result = await userService.resetPassword(user_id, req.body.new_password);
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'New password has been updated',
+    result
+  });
+};
+
 export {
   loginController,
   registerController,
   logoutController,
   emailVerifyTokenController,
   forgotPasswordController,
-  verifyForgotPasswordTokenController
+  verifyForgotPasswordTokenController,
+  resetPasswordController
 };
