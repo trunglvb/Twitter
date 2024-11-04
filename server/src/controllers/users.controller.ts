@@ -7,7 +7,6 @@ import { EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
 import databaseService from '@/services/database.services';
 import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
-import { verifyToken } from '@/utils/jwt';
 
 type ILoginBody = Pick<IRegisterRequestBody, 'email' | 'password'>;
 type IForgotPasswordBody = {
@@ -134,6 +133,15 @@ const resetPasswordController = async (
   });
 };
 
+const getProfileController = async (req: Request, res: Response, _next: NextFunction) => {
+  const { user_id } = req.decode_access_token!;
+  const result = await userService.getProfile(user_id);
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'Get user infomation success',
+    user: result
+  });
+};
+
 export {
   loginController,
   registerController,
@@ -141,5 +149,6 @@ export {
   emailVerifyTokenController,
   forgotPasswordController,
   verifyForgotPasswordTokenController,
-  resetPasswordController
+  resetPasswordController,
+  getProfileController
 };

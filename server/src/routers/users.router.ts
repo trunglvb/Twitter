@@ -1,6 +1,7 @@
 import {
   emailVerifyTokenController,
   forgotPasswordController,
+  getProfileController,
   loginController,
   logoutController,
   registerController,
@@ -58,5 +59,8 @@ usersRouter.post(
   resetPasswordValidator,
   wrapRequestHandler(resetPasswordController)
 );
+
+//get profile
+usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getProfileController));
 
 export default usersRouter;
