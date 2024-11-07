@@ -66,6 +66,8 @@ usersRouter.post(
 usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getProfileController));
 
 //update profile use patch
+//khi dung patch, gui phan nao vao body thi se cap nhat phan do, khong can gui tat ca cac truong nhu put
+
 usersRouter.patch('/update-me', accessTokenValidator, verifyUserValidator, wrapRequestHandler(updateProfile));
 
 export default usersRouter;

@@ -469,6 +469,74 @@ const verifyUserValidator = (req: Request, _res: Response, next: NextFunction) =
   next();
 };
 
+const updateMeValidator = validate(
+  checkSchema(
+    {
+      name: {
+        optional: true,
+        isLength: {
+          options: { max: 255 },
+          errorMessage: 'Name must be between 1 and 255 characters'
+        },
+        isString: {
+          errorMessage: 'Name must be string'
+        },
+        trim: true
+      },
+      date_of_birth: {
+        optional: true,
+        isISO8601: {
+          options: { strict: true, strictSeparator: true },
+          errorMessage: 'Date of birth must be a valid ISO 8601 date'
+        }
+      },
+      bio: {
+        optional: true,
+        trim: true,
+        isString: {
+          errorMessage: 'Bio must be string'
+        }
+      },
+      location: {
+        optional: true,
+        trim: true,
+        isString: {
+          errorMessage: 'Location must be string'
+        }
+      },
+      website: {
+        optional: true,
+        trim: true,
+        isString: {
+          errorMessage: 'Website must be string'
+        }
+      },
+      username: {
+        optional: true,
+        trim: true,
+        isString: {
+          errorMessage: 'User name must be string'
+        }
+      },
+      avatar: {
+        optional: true,
+        trim: true,
+        isString: {
+          errorMessage: 'Avatar url must be string'
+        }
+      },
+      cover_photo: {
+        optional: true,
+        trim: true,
+        isString: {
+          errorMessage: 'Cover photo must be string'
+        }
+      }
+    },
+    ['body']
+  )
+);
+
 export {
   loginValidator,
   registerValidator,

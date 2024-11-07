@@ -16,4 +16,15 @@ type ITokenPayload = {
   exp: number;
 };
 
-export { IRegisterRequestBody, ITokenPayload };
+interface IUpdateMeBody {
+  name?: string;
+  day_of_birth?: string;
+  bio?: string;
+  location?: string;
+  website?: string;
+  username?: string;
+  avatar?: string;
+  cover_photo?: string;
+}
+
+export { IRegisterRequestBody, ITokenPayload, IUpdateMeBody };
