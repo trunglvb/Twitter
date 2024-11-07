@@ -1,3 +1,5 @@
+import { EUserVerifyStatus } from '@/constants/enums';
+
 type IRegisterRequestBody = {
   name: string;
   email: string;
@@ -8,6 +10,7 @@ type IRegisterRequestBody = {
 
 type ITokenPayload = {
   user_id: string;
+  verify: EUserVerifyStatus;
   token_type: number;
   iat: number;
   exp: number;

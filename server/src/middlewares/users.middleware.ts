@@ -1,4 +1,4 @@
-import { HttpStatusCode } from '@/constants/enums';
+import { EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
 import databaseService from '@/services/database.services';
 import userService from '@/services/user.services';
 import { hashPassword } from '@/utils/crypto';
@@ -9,6 +9,7 @@ import { checkSchema } from 'express-validator';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ObjectId } from 'mongodb';
+import { NextFunction, Request, Response } from 'express';
 
 dotenv.config();
 const loginValidator = validate(
@@ -386,6 +387,7 @@ const resetPasswordValidator = validate(
     ['body']
   )
 );
+
 const resetForgotPasswordValidator = validate(
   checkSchema(
     {
@@ -456,6 +458,17 @@ const resetForgotPasswordValidator = validate(
   )
 );
 
+const verifyUserValidator = (req: Request, _res: Response, next: NextFunction) => {
+  const { verify } = req.decode_access_token!;
+  if (verify !== EUserVerifyStatus.Verified) {
+    throw new ErrorWithStatus({
+      message: 'User not verified',
+      status: HttpStatusCode.Forbidden
+    });
+  }
+  next();
+};
+
 export {
   loginValidator,
   registerValidator,
@@ -465,5 +478,6 @@ export {
   forgotPasswordEmailValidator,
   forgotPasswordTokenValidator,
   resetPasswordValidator,
-  resetForgotPasswordValidator
+  resetForgotPasswordValidator,
+  verifyUserValidator
 };

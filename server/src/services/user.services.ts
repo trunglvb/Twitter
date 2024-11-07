@@ -113,7 +113,7 @@ class UsersService {
   };
   verifyEmail = async (user_id: string) => {
     const tokenPayLoad = {
-      user_id: user_id?.toString() as string,
+      user_id: user_id?.toString(),
       verify: EUserVerifyStatus.Unverified
     };
     const [_result, accessToken, refreshToken] = await Promise.all([
@@ -140,7 +140,7 @@ class UsersService {
   resendEmailVerify = async (user_id: string) => {
     //B1: send email
     const tokenPayLoad = {
-      user_id: user_id?.toString() as string,
+      user_id: user_id?.toString(),
       verify: EUserVerifyStatus.Unverified
     };
     const email_verify_token = await this.signEmailVerifyToken(tokenPayLoad);

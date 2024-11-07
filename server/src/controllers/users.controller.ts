@@ -142,6 +142,11 @@ const getProfileController = async (req: Request, res: Response, _next: NextFunc
   });
 };
 
+const updateProfile = async (req: Request, res: Response, _next: NextFunction) => {
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'Okk'
+  });
+};
 export {
   loginController,
   registerController,
@@ -150,5 +155,6 @@ export {
   forgotPasswordController,
   verifyForgotPasswordTokenController,
   resetPasswordController,
-  getProfileController
+  getProfileController,
+  updateProfile
 };

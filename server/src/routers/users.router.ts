@@ -7,6 +7,7 @@ import {
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
+  updateProfile,
   verifyForgotPasswordTokenController
 } from '@/controllers/users.controller';
 import {
@@ -18,7 +19,8 @@ import {
   refreshTokenValidator,
   registerValidator,
   resetForgotPasswordValidator,
-  resetPasswordValidator
+  resetPasswordValidator,
+  verifyUserValidator
 } from '@/middlewares/users.middleware';
 import { wrapRequestHandler } from '@/utils/handlers';
 import express from 'express';
@@ -62,5 +64,8 @@ usersRouter.post(
 
 //get profile
 usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getProfileController));
+
+//update profile use patch
+usersRouter.patch('/update-me', accessTokenValidator, verifyUserValidator, wrapRequestHandler(updateProfile));
 
 export default usersRouter;
