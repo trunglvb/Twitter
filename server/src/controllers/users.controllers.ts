@@ -1,7 +1,7 @@
 import { ParamsDictionary } from 'express-serve-static-core';
 import userService from '@/services/user.services';
 import { NextFunction, Request, Response } from 'express';
-import { IRegisterRequestBody } from '@/models/requests/user.request';
+import { IRegisterRequestBody, IUpdateMeBody } from '@/models/requests/user.request';
 import User from '@/models/schemas/users.schema';
 import { EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
 import databaseService from '@/services/database.services';
@@ -142,9 +142,19 @@ const getProfileController = async (req: Request, res: Response, _next: NextFunc
   });
 };
 
-const updateProfile = async (req: Request, res: Response, _next: NextFunction) => {
+const updateProfile = async (
+  req: Request<ParamsDictionary, any, IUpdateMeBody>,
+  res: Response,
+  _next: NextFunction
+) => {
+  const { body, decode_access_token } = req;
+  const result = await userService.updateMe({
+    body: body,
+    user_id: decode_access_token?.user_id!
+  });
   return res.status(HttpStatusCode.Ok).json({
-    message: 'Okk'
+    message: 'Update user success',
+    user: result
   });
 };
 export {

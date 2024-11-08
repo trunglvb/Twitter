@@ -152,7 +152,7 @@ const accessTokenValidator = validate(
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
-                  message: 'Refresh token is invalid',
+                  message: 'Access token is invalid',
                   status: HttpStatusCode.Unauthorized
                 });
               }
@@ -492,45 +492,45 @@ const updateMeValidator = validate(
       },
       bio: {
         optional: true,
-        trim: true,
         isString: {
           errorMessage: 'Bio must be string'
-        }
+        },
+        trim: true
       },
       location: {
         optional: true,
-        trim: true,
         isString: {
           errorMessage: 'Location must be string'
-        }
+        },
+        trim: true
       },
       website: {
         optional: true,
-        trim: true,
         isString: {
           errorMessage: 'Website must be string'
-        }
+        },
+        trim: true
       },
       username: {
         optional: true,
-        trim: true,
         isString: {
           errorMessage: 'User name must be string'
-        }
+        },
+        trim: true
       },
       avatar: {
         optional: true,
-        trim: true,
         isString: {
           errorMessage: 'Avatar url must be string'
-        }
+        },
+        trim: true
       },
       cover_photo: {
         optional: true,
-        trim: true,
         isString: {
           errorMessage: 'Cover photo must be string'
-        }
+        },
+        trim: true
       }
     },
     ['body']
@@ -547,5 +547,6 @@ export {
   forgotPasswordTokenValidator,
   resetPasswordValidator,
   resetForgotPasswordValidator,
-  verifyUserValidator
+  verifyUserValidator,
+  updateMeValidator
 };

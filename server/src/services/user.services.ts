@@ -1,5 +1,5 @@
 import { ETokenType, EUserVerifyStatus } from '@/constants/enums';
-import { IRegisterRequestBody } from '@/models/requests/user.request';
+import { IRegisterRequestBody, IUpdateMeBody } from '@/models/requests/user.request';
 import RefreshTokens from '@/models/schemas/refreshTokens.schema';
 import User from '@/models/schemas/users.schema';
 import databaseService from '@/services/database.services';
@@ -212,6 +212,35 @@ class UsersService {
         }
       }
     );
+    return user;
+  };
+
+  updateMe = async ({ body, user_id }: { body: IUpdateMeBody; user_id: string }) => {
+    const _body = body.date_of_birth ? { ...body, date_of_birth: new Date(body.date_of_birth) } : body;
+
+    const user = await databaseService.users.findOneAndUpdate(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          ...(_body as IUpdateMeBody & { date_of_birth?: Date })
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0
+        }
+      }
+    );
+
+    console.log(user);
+
     return user;
   };
 }

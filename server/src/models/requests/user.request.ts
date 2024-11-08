@@ -18,7 +18,7 @@ type ITokenPayload = {
 
 interface IUpdateMeBody {
   name?: string;
-  day_of_birth?: string;
+  date_of_birth?: string;
   bio?: string;
   location?: string;
   website?: string;

@@ -9,7 +9,7 @@ import {
   resetPasswordController,
   updateProfile,
   verifyForgotPasswordTokenController
-} from '@/controllers/users.controller';
+} from '@/controllers/users.controllers';
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
@@ -20,6 +20,7 @@ import {
   registerValidator,
   resetForgotPasswordValidator,
   resetPasswordValidator,
+  updateMeValidator,
   verifyUserValidator
 } from '@/middlewares/users.middleware';
 import { wrapRequestHandler } from '@/utils/handlers';
@@ -68,6 +69,12 @@ usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getProfileContro
 //update profile use patch
 //khi dung patch, gui phan nao vao body thi se cap nhat phan do, khong can gui tat ca cac truong nhu put
 
-usersRouter.patch('/update-me', accessTokenValidator, verifyUserValidator, wrapRequestHandler(updateProfile));
+usersRouter.patch(
+  '/update-me',
+  accessTokenValidator,
+  verifyUserValidator,
+  updateMeValidator,
+  wrapRequestHandler(updateProfile)
+);
 
 export default usersRouter;
