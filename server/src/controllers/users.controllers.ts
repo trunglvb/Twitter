@@ -7,6 +7,7 @@ import { EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
 import databaseService from '@/services/database.services';
 import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
+import { pick } from 'lodash';
 
 type ILoginBody = Pick<IRegisterRequestBody, 'email' | 'password'>;
 type IForgotPasswordBody = {
@@ -149,7 +150,7 @@ const updateProfile = async (
 ) => {
   const { body, decode_access_token } = req;
   const result = await userService.updateMe({
-    body: body,
+    body: pick(body, ['date_of_birth', 'name', 'bio', 'location', 'website', 'username', 'avatar', 'cover_photo']),
     user_id: decode_access_token?.user_id!
   });
   return res.status(HttpStatusCode.Ok).json({
