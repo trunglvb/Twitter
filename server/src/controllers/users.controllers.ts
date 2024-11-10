@@ -1,7 +1,7 @@
 import { ParamsDictionary } from 'express-serve-static-core';
 import userService from '@/services/user.services';
 import { NextFunction, Request, Response } from 'express';
-import { IRegisterRequestBody, IUpdateMeBody } from '@/models/requests/user.request';
+import { IFollowedUserBody, IRegisterRequestBody, IUpdateMeBody } from '@/models/requests/user.request';
 import User from '@/models/schemas/users.schema';
 import { EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
 import databaseService from '@/services/database.services';
@@ -158,6 +158,24 @@ const updateProfile = async (
     user: result
   });
 };
+
+const followedUserController = async (
+  req: Request<ParamsDictionary, any, IFollowedUserBody>,
+  res: Response,
+  _next: NextFunction
+) => {
+  const { user_id } = req.decode_access_token!;
+  const { followed_user_id } = req.body;
+
+  const result = await userService.follower({
+    user_id: user_id,
+    followed_user_id: followed_user_id
+  });
+  return res.status(200).json({
+    message: result.message
+  });
+};
+
 export {
   loginController,
   registerController,
@@ -167,5 +185,6 @@ export {
   verifyForgotPasswordTokenController,
   resetPasswordController,
   getProfileController,
-  updateProfile
+  updateProfile,
+  followedUserController
 };

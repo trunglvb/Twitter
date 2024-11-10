@@ -27,4 +27,8 @@ interface IUpdateMeBody {
   cover_photo?: string;
 }
 
-export { IRegisterRequestBody, ITokenPayload, IUpdateMeBody };
+interface IFollowedUserBody {
+  followed_user_id: string;
+}
+
+export { IRegisterRequestBody, ITokenPayload, IUpdateMeBody, IFollowedUserBody };

@@ -1,5 +1,6 @@
 import {
   emailVerifyTokenController,
+  followedUserController,
   forgotPasswordController,
   getProfileController,
   loginController,
@@ -13,6 +14,7 @@ import {
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
+  followersValidator,
   forgotPasswordEmailValidator,
   forgotPasswordTokenValidator,
   loginValidator,
@@ -76,5 +78,8 @@ usersRouter.patch(
   updateMeValidator,
   wrapRequestHandler(updateProfile)
 );
+
+//follower
+usersRouter.post('/follower', accessTokenValidator, followersValidator, wrapRequestHandler(followedUserController));
 
 export default usersRouter;

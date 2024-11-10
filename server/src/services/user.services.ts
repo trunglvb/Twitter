@@ -1,5 +1,6 @@
 import { ETokenType, EUserVerifyStatus } from '@/constants/enums';
 import { IRegisterRequestBody, IUpdateMeBody } from '@/models/requests/user.request';
+import Followers from '@/models/schemas/follower.schema';
 import RefreshTokens from '@/models/schemas/refreshTokens.schema';
 import User from '@/models/schemas/users.schema';
 import databaseService from '@/services/database.services';
@@ -239,6 +240,23 @@ class UsersService {
       }
     );
     return user;
+  };
+
+  follower = async ({ user_id, followed_user_id }: { user_id: string; followed_user_id: string }) => {
+    const follower = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    });
+    if (follower == null) {
+      await databaseService.followers.insertOne(
+        new Followers({
+          user_id: new ObjectId(user_id),
+          followed_user_id: new ObjectId(followed_user_id)
+        })
+      );
+      return { message: 'Follow user success' };
+    }
+    return { message: 'Followed' };
   };
 }
 
