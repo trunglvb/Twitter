@@ -1,3 +1,4 @@
+import { ParamsDictionary } from 'express-serve-static-core';
 import { EUserVerifyStatus } from '@/constants/enums';
 
 type IRegisterRequestBody = {
@@ -31,4 +32,8 @@ interface IFollowedUserBody {
   followed_user_id: string;
 }
 
-export { IRegisterRequestBody, ITokenPayload, IUpdateMeBody, IFollowedUserBody };
+interface IUnfollowUserParams extends ParamsDictionary {
+  user_id: string;
+}
+
+export { IRegisterRequestBody, ITokenPayload, IUpdateMeBody, IFollowedUserBody, IUnfollowUserParams };

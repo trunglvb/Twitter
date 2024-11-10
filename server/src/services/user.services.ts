@@ -258,6 +258,21 @@ class UsersService {
     }
     return { message: 'Followed' };
   };
+
+  unfollow = async ({ user_id, followed_user_id }: { user_id: string; followed_user_id: string }) => {
+    const user = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    });
+    if (user == null) {
+      return { message: 'Already unfollowed' };
+    }
+    await databaseService.followers.deleteOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    });
+    return { message: 'Unfollow success' };
+  };
 }
 
 const userService = new UsersService();

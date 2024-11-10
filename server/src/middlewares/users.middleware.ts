@@ -537,7 +537,7 @@ const updateMeValidator = validate(
   )
 );
 
-const followersValidator = validate(
+const followValidator = validate(
   checkSchema(
     {
       // day cung la id cua uset, cahcn check xem user co ton tai hay khong
@@ -569,6 +569,38 @@ const followersValidator = validate(
   )
 );
 
+const unfollowValidator = validate(
+  checkSchema(
+    {
+      // day cung la id cua uset, cahcn check xem user co ton tai hay khong
+      user_id: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus({
+                status: HttpStatusCode.NotFound,
+                message: 'User id is invalid'
+              });
+            }
+            const user = await databaseService.users.findOne({
+              _id: new ObjectId(value)
+            });
+            if (user == null) {
+              throw new ErrorWithStatus({
+                message: 'User not found',
+                status: HttpStatusCode.NotFound
+              });
+            }
+            return true;
+          }
+        }
+      }
+    },
+    ['params']
+  )
+);
+
 export {
   loginValidator,
   registerValidator,
@@ -581,5 +613,6 @@ export {
   resetForgotPasswordValidator,
   verifyUserValidator,
   updateMeValidator,
-  followersValidator
+  followValidator,
+  unfollowValidator
 };

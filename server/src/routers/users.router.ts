@@ -8,13 +8,14 @@ import {
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
+  unfollowUserController,
   updateProfile,
   verifyForgotPasswordTokenController
 } from '@/controllers/users.controllers';
 import {
   accessTokenValidator,
   emailVerifyTokenValidator,
-  followersValidator,
+  followValidator,
   forgotPasswordEmailValidator,
   forgotPasswordTokenValidator,
   loginValidator,
@@ -22,6 +23,7 @@ import {
   registerValidator,
   resetForgotPasswordValidator,
   resetPasswordValidator,
+  unfollowValidator,
   updateMeValidator,
   verifyUserValidator
 } from '@/middlewares/users.middleware';
@@ -80,6 +82,20 @@ usersRouter.patch(
 );
 
 //follower
-usersRouter.post('/follower', accessTokenValidator, followersValidator, wrapRequestHandler(followedUserController));
+usersRouter.post(
+  '/follow',
+  accessTokenValidator,
+  verifyUserValidator,
+  followValidator,
+  wrapRequestHandler(followedUserController)
+);
+//unfollow user
+usersRouter.delete(
+  '/follow/:user_id',
+  accessTokenValidator,
+  verifyUserValidator,
+  unfollowValidator,
+  wrapRequestHandler(unfollowUserController)
+);
 
 export default usersRouter;
