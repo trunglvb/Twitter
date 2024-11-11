@@ -191,7 +191,6 @@ class UsersService {
       [
         {
           $set: {
-            forgot_password_token: '',
             password: hashPassword(new_password),
             updated_at: '$$NOW'
           }

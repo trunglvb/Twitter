@@ -10,6 +10,7 @@ import { JsonWebTokenError } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ObjectId } from 'mongodb';
 import { NextFunction, Request, Response } from 'express';
+import { USERNAME_REGEX } from '@/constants/regex';
 
 dotenv.config();
 const loginValidator = validate(
@@ -516,7 +517,19 @@ const updateMeValidator = validate(
         isString: {
           errorMessage: 'User name must be string'
         },
-        trim: true
+        trim: true,
+        custom: {
+          options: async (val: string) => {
+            console.log('val', val);
+            if (!USERNAME_REGEX.test(val)) {
+              throw new Error('Username is invalid');
+            }
+            const user = await databaseService.users.findOne({ username: val });
+            if (user != null) {
+              throw new Error('Username is exist');
+            }
+          }
+        }
       },
       avatar: {
         optional: true,

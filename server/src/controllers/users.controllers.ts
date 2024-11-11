@@ -154,13 +154,12 @@ const updateProfile = async (
   _next: NextFunction
 ) => {
   const { body, decode_access_token } = req;
-  const result = await userService.updateMe({
+  await userService.updateMe({
     body: pick(body, ['date_of_birth', 'name', 'bio', 'location', 'website', 'username', 'avatar', 'cover_photo']),
     user_id: decode_access_token?.user_id!
   });
   return res.status(HttpStatusCode.Ok).json({
-    message: 'Update user success',
-    user: result
+    message: 'Update user success'
   });
 };
 
