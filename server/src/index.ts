@@ -11,7 +11,7 @@ databaseService.connect().catch(console.dir);
 app.use(express.json()); // parse sang dang json de xu ly body gui len
 
 //route
-app.use('/users', usersRouter);
+app.use('/api/users', usersRouter);
 
 //error handler
 app.use(defaultError);

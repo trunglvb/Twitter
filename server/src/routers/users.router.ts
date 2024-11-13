@@ -89,6 +89,7 @@ usersRouter.post(
   followValidator,
   wrapRequestHandler(followedUserController)
 );
+
 //unfollow user
 usersRouter.delete(
   '/follow/:user_id',
