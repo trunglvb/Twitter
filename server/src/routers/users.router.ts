@@ -5,6 +5,7 @@ import {
   getProfileController,
   loginController,
   logoutController,
+  oauthController,
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
@@ -98,5 +99,8 @@ usersRouter.delete(
   unfollowValidator,
   wrapRequestHandler(unfollowUserController)
 );
+
+//login google
+usersRouter.get('/oauth/google', wrapRequestHandler(oauthController));
 
 export default usersRouter;

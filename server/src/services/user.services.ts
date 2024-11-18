@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { ETokenType, EUserVerifyStatus } from '@/constants/enums';
 import { IRegisterRequestBody, IUpdateMeBody } from '@/models/requests/user.request';
 import Followers from '@/models/schemas/follower.schema';
@@ -271,6 +272,28 @@ class UsersService {
       followed_user_id: new ObjectId(followed_user_id)
     });
     return { message: 'Unfollow success' };
+  };
+
+  //oauth
+  private getOauthGoogleToken = async (code: string) => {
+    const body = {
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: process.env.GOOGLE_AUTHORIZED_REDIRECT_URI,
+      grant_type: 'authorization_code'
+    };
+    const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+    return data;
+  };
+  oauth = async (code: string) => {
+    //dung code thong qua google api de lay id_token va access token
+    const data = await this.getOauthGoogleToken(code);
+    console.log(data);
   };
 }
 

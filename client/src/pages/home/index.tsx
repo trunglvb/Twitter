@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export default function Home() {
 	const getGoolgeAuthUrl = () => {
@@ -12,11 +13,18 @@ export default function Home() {
 				"https://www.googleapis.com/auth/userinfo.profile",
 				"https://www.googleapis.com/auth/userinfo.email",
 			].join(" "),
+			prompt: "consent",
 		};
+		const queryString = new URLSearchParams(query).toString();
+		return `${url}?${queryString}`;
 	};
+
+	const url = getGoolgeAuthUrl();
 	return (
 		<div>
-			<Button>Login Google</Button>
+			<Button>
+				<Link to={url}>Login Google</Link>
+			</Button>
 		</div>
 	);
 }

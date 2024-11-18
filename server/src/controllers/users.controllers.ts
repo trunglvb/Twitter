@@ -193,6 +193,14 @@ const unfollowUserController = async (req: Request, res: Response, _next: NextFu
   });
 };
 
+const oauthController = async (req: Request, res: Response, _next: NextFunction) => {
+  const { code } = req.query;
+  await userService.oauth(code as string);
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'oauth'
+  });
+};
+
 export {
   loginController,
   registerController,
@@ -204,5 +212,6 @@ export {
   getProfileController,
   updateProfile,
   followedUserController,
-  unfollowUserController
+  unfollowUserController,
+  oauthController
 };
