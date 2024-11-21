@@ -13,6 +13,9 @@ import databaseService from '@/services/database.services';
 import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
 import { pick } from 'lodash';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 type ILoginBody = Pick<IRegisterRequestBody, 'email' | 'password'>;
 type IForgotPasswordBody = {
@@ -195,10 +198,9 @@ const unfollowUserController = async (req: Request, res: Response, _next: NextFu
 
 const oauthController = async (req: Request, res: Response, _next: NextFunction) => {
   const { code } = req.query;
-  await userService.oauth(code as string);
-  return res.status(HttpStatusCode.Ok).json({
-    message: 'oauth'
-  });
+  const result = await userService.oauth(code as string);
+  const urlRedirect = `${process.env.CLIENT_REDIRECT_URI}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&new_user=${result.newUser}`;
+  return res.redirect(urlRedirect);
 };
 
 export {

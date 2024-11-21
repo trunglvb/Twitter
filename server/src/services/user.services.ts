@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { ETokenType, EUserVerifyStatus } from '@/constants/enums';
-import { IRegisterRequestBody, IUpdateMeBody } from '@/models/requests/user.request';
+import { ETokenType, EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
+import { IGoogleUser, IRegisterRequestBody, IUpdateMeBody } from '@/models/requests/user.request';
 import Followers from '@/models/schemas/follower.schema';
 import RefreshTokens from '@/models/schemas/refreshTokens.schema';
 import User from '@/models/schemas/users.schema';
@@ -9,6 +9,7 @@ import { hashPassword } from '@/utils/crypto';
 import { signToken } from '@/utils/jwt';
 import { config } from 'dotenv';
 import { ObjectId } from 'mongodb';
+import { ErrorWithStatus } from '@/utils/errors';
 
 config();
 class UsersService {
@@ -288,12 +289,67 @@ class UsersService {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     });
-    return data;
+    return data as {
+      access_token: string;
+      id_token: string;
+    };
+  };
+
+  private getGoolgeUser = async (access_token: string, id_token: string) => {
+    const { data } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
+      params: {
+        access_token,
+        alt: 'json'
+      },
+      headers: {
+        Authorization: `Bearer ${id_token}`
+      }
+    });
+    return data as IGoogleUser;
   };
   oauth = async (code: string) => {
     //dung code thong qua google api de lay id_token va access token
-    const data = await this.getOauthGoogleToken(code);
-    console.log(data);
+    const { id_token, access_token } = await this.getOauthGoogleToken(code);
+    const user = await this.getGoolgeUser(access_token, id_token);
+    if (!user.verified_email) {
+      throw new ErrorWithStatus({
+        status: HttpStatusCode.BadGateway,
+        message: 'Gmail is not verify'
+      });
+    }
+    const alreadyUser = await databaseService.users.findOne({
+      email: user.email
+    });
+
+    //da ton tai email thi login
+    if (alreadyUser?.email) {
+      const tokenPayLoad = {
+        user_id: alreadyUser._id.toString(),
+        verify: EUserVerifyStatus.Unverified
+      };
+      const [access_token, refresh_token] = await Promise.all([
+        this.signAccessToken(tokenPayLoad),
+        this.signRefreshToken(tokenPayLoad)
+      ]);
+      await databaseService.refreshTokens.insertOne(
+        new RefreshTokens({
+          token: refresh_token,
+          user_id: alreadyUser._id
+        })
+      );
+      return { access_token, refresh_token, newUser: false };
+    } else {
+      //chua co thi tao moi
+      const password = Math.random().toString(36).substring(2, 7);
+      const result = await this.register({
+        name: user.name,
+        email: user.email,
+        date_of_birth: new Date().toISOString()!,
+        password: password,
+        confirm_password: password
+      });
+      return { ...result, newUser: true };
+    }
   };
 }
 
