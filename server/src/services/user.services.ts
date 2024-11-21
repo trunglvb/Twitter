@@ -77,17 +77,17 @@ class UsersService {
         password: hashPassword(payload.password)
       })
     );
-    const [accessToken, refreshToken] = await Promise.all([
+    const [access_token, refresh_token] = await Promise.all([
       this.signAccessToken(tokenPayLoad),
       this.signRefreshToken(tokenPayLoad)
     ]);
     await databaseService.refreshTokens.insertOne(
       new RefreshTokens({
-        token: refreshToken,
+        token: refresh_token,
         user_id: user_id
       })
     );
-    return { accessToken, refreshToken };
+    return { access_token, refresh_token };
   };
   login = async (user: User) => {
     const { _id, verify } = user;

@@ -1,5 +1,6 @@
 const path = {
-  home: '/'
-} as const
+	home: "/",
+	googleLogin: "/login/oauth",
+} as const;
 
-export default path
+export default path;

@@ -15,6 +15,15 @@ const useRouteElement = () => {
 				</MainLayout>
 			),
 		},
+		{
+			index: true,
+			path: path.googleLogin,
+			element: (
+				<MainLayout>
+					<Home />
+				</MainLayout>
+			),
+		},
 	]);
 	return routeElement;
 };
