@@ -3,5 +3,5 @@ import { wrapRequestHandler } from '@/utils/handlers';
 import express from 'express';
 const mediaRouter = express.Router();
 
-mediaRouter.post('/upload-file', uploadSingleImageController);
+mediaRouter.post('/upload-file', wrapRequestHandler(uploadSingleImageController));
 export default mediaRouter;
