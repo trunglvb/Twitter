@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 export const uploadSingleImageController = async (req: Request, res: Response, _next: NextFunction) => {
   const data = await mediaServices.handleUploadSingleImage(req);
   return res.json({
-    message: 'Success',
+    message: 'Upload image success',
     data: data
   });
 };
