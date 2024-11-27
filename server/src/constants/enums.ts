@@ -76,3 +76,8 @@ export enum HttpStatusCode {
   NotExtended = 510,
   NetworkAuthenticationRequired = 511
 }
+
+export enum MediaType {
+  Image,
+  Video
+}

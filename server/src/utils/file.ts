@@ -13,12 +13,12 @@ export const initFolder = () => {
   }
 };
 
-export const handleUploadSingleImage = async (req: Request) => {
+export const handleUploadImage = async (req: Request, maxFiles: number) => {
   const form = formidable({
     uploadDir: UPLOAD_TEMP_DIR,
-    maxFiles: 1,
+    maxFiles: maxFiles,
     keepExtensions: true, // khi upload thi lay duoi mo rong,
-    maxFileSize: 2000 * 1024, // 2MB
+    maxFileSize: maxFiles * 1024 * 500, // 500KB
     filter: function ({ name, originalFilename, mimetype }) {
       // keep only images
       //name la key
@@ -30,7 +30,7 @@ export const handleUploadSingleImage = async (req: Request) => {
     }
   });
 
-  return new Promise<File>((resolve, reject) => {
+  return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
         return reject(err);
@@ -38,7 +38,7 @@ export const handleUploadSingleImage = async (req: Request) => {
       if (!Boolean(files?.image)) {
         return reject(new Error('Image is require'));
       }
-      resolve((files.image as File[])[0]);
+      resolve(files.image as File[]);
     });
   });
 };
