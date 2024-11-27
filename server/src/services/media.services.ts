@@ -5,6 +5,8 @@ import { Request } from 'express';
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
+import dotenv from 'dotenv';
+dotenv.config();
 
 class MediaService {
   handleUploadSingleImage = async (req: Request) => {
@@ -15,8 +17,8 @@ class MediaService {
       .toFile(path.resolve(UPLOAD_DIR, `${newName}.jpg`));
     fs.unlinkSync(file.filepath);
     return IS_PRODUCTION
-      ? `http://twitter-clone.com/uploads/${newName}.jpg`
-      : `http://localhost:4000/uploads/${newName}.jpg`;
+      ? `${process.env.SERVER_HOST}/uploads/${newName}.jpg`
+      : `http://localhost:${process.env.PORT}/uploads/${newName}.jpg`;
   };
 }
 

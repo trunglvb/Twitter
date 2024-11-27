@@ -8,6 +8,10 @@ import { defaultError } from '@/middlewares/error.middleware';
 import mediaRouter from '@/routers/media.route';
 import { initFolder } from '@/utils/file';
 import argv from 'minimist';
+import path from 'path';
+import { UPLOAD_DIR } from '@/constants/dir';
+
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 console.log(process.argv);
 const enviroment = argv(process.argv.slice(2)).development;
