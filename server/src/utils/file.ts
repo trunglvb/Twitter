@@ -1,11 +1,10 @@
 import fs from 'fs';
-import path from 'path';
 import { Request } from 'express';
 import formidable, { File } from 'formidable';
-import { UPLOAD_TEMP_DIR } from '@/constants/dir';
+import { UPLOAD_IMAGE_TEMP_DIR } from '@/constants/dir';
 
 export const initFolder = () => {
-  const uploadFolderPath = UPLOAD_TEMP_DIR;
+  const uploadFolderPath = UPLOAD_IMAGE_TEMP_DIR;
   if (!fs.existsSync(uploadFolderPath)) {
     fs.mkdirSync(uploadFolderPath, {
       recursive: true // tao folder nested
@@ -15,7 +14,7 @@ export const initFolder = () => {
 
 export const handleUploadImage = async (req: Request, maxFiles: number) => {
   const form = formidable({
-    uploadDir: UPLOAD_TEMP_DIR,
+    uploadDir: UPLOAD_IMAGE_TEMP_DIR,
     maxFiles: maxFiles,
     keepExtensions: true, // khi upload thi lay duoi mo rong,
     maxFileSize: maxFiles * 1024 * 500, // 500KB

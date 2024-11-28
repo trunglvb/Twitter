@@ -11,15 +11,11 @@ import argv from 'minimist';
 import path from 'path';
 import { UPLOAD_DIR } from '@/constants/dir';
 
-app.use('/uploads', express.static(UPLOAD_DIR));
-
-console.log(process.argv);
-const enviroment = argv(process.argv.slice(2)).development;
-
 initFolder();
 dotenv.config();
 databaseService.connect().catch(console.dir);
 app.use(express.json()); // parse sang dang json de xu ly body gui len
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 //route
 app.use('/api/users', usersRouter);
