@@ -1,4 +1,8 @@
-import { uploadMultipleImageController, uploadSingleImageController } from '@/controllers/media.controllers';
+import {
+  uploadMultipleImageController,
+  uploadSingleImageController,
+  uploadVideoController
+} from '@/controllers/media.controllers';
 import { accessTokenValidator, verifyUserValidator } from '@/middlewares/users.middleware';
 import { wrapRequestHandler } from '@/utils/handlers';
 import express from 'express';
@@ -18,4 +22,5 @@ mediaRouter.post(
   wrapRequestHandler(uploadMultipleImageController)
 );
 
+mediaRouter.post('/upload-video', wrapRequestHandler(uploadVideoController));
 export default mediaRouter;

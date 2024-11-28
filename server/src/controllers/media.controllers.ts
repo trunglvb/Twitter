@@ -16,3 +16,11 @@ export const uploadMultipleImageController = async (req: Request, res: Response,
     data: data
   });
 };
+
+export const uploadVideoController = async (req: Request, res: Response, _next: NextFunction) => {
+  const data = await mediaServices.handleUploadVideo(req);
+  return res.json({
+    message: 'Upload video success',
+    data: data
+  });
+};
