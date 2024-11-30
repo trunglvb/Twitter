@@ -1,20 +1,22 @@
 import fs from 'fs';
 import { Request } from 'express';
 import formidable, { File } from 'formidable';
-import { UPLOAD_IMAGE_DIR } from '@/constants/dir';
+import { UPLOAD_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_IMAGE_DIR } from '@/constants/dir';
 
 export const initFolder = () => {
-  const uploadFolderPath = UPLOAD_IMAGE_DIR;
-  if (!fs.existsSync(uploadFolderPath)) {
-    fs.mkdirSync(uploadFolderPath, {
-      recursive: true // tao folder nested
-    });
-  }
+  const uploadFolderPath = [UPLOAD_TEMP_DIR, UPLOAD_VIDEO_DIR, UPLOAD_IMAGE_DIR];
+  uploadFolderPath.forEach((dir) => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, {
+        recursive: true // tao folder nested
+      });
+    }
+  });
 };
 
 export const handleUploadImage = async (req: Request, maxFiles: number) => {
   const form = formidable({
-    uploadDir: UPLOAD_IMAGE_DIR,
+    uploadDir: UPLOAD_TEMP_DIR,
     maxFiles: maxFiles,
     keepExtensions: true, // khi upload thi lay duoi mo rong,
     maxFileSize: maxFiles * 1024 * 500, // 500KB
@@ -44,10 +46,10 @@ export const handleUploadImage = async (req: Request, maxFiles: number) => {
 
 export const handleUploadVideo = async (req: Request) => {
   const form = formidable({
-    uploadDir: UPLOAD_IMAGE_DIR,
+    uploadDir: UPLOAD_VIDEO_DIR,
     maxFiles: 1,
-    // keepExtensions: true, // khi upload thi lay duoi mo rong,
-    maxFileSize: 1024 * 5000, // 50MB
+    keepExtensions: true, // khi upload thi lay duoi mo rong,
+    maxFileSize: 50 * 1024 * 1024, // 50MB
     filter: function ({ name, originalFilename, mimetype }) {
       // keep only images
       //name la key

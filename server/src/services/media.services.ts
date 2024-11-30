@@ -11,9 +11,9 @@ import { IMedia } from '@/models/types/media.types';
 dotenv.config();
 
 class MediaService {
-  handleUploadImage = async (req: Request, maxFiles: number) => {
-    const files = await handleUploadImage(req, maxFiles);
-    const newName = getFileName(files[0]?.newFilename);
+  handleUploadVideo = async (req: Request) => {
+    const files = await handleUploadVideo(req);
+    const newName = files[0]?.newFilename!;
     return {
       url: IS_PRODUCTION
         ? `${process.env.SERVER_HOST}/uploads/${newName}`
@@ -21,11 +21,17 @@ class MediaService {
       type: MediaType.Video
     };
   };
-  handleUploadVideo = async (req: Request) => {
-    const files = await handleUploadVideo(req);
+  handleUploadImage = async (req: Request, maxFiles: number) => {
+    const files = await handleUploadImage(req, maxFiles);
     const result: IMedia[] = await Promise.all(
       files?.map(async (file) => {
         const newName = getFileName(file?.newFilename);
+        //voi image can duong dan tam thoi de resize anh, sau do tao duong dan moi va xoa dung dan temp
+        await sharp(file?.filepath)
+          .jpeg({ mozjpeg: true, quality: 75 })
+          .toFile(path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`));
+        fs.unlinkSync(file.filepath);
+
         return {
           url: IS_PRODUCTION
             ? `${process.env.SERVER_HOST}/uploads/${newName}.jpg`

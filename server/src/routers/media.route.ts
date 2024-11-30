@@ -22,5 +22,5 @@ mediaRouter.post(
   wrapRequestHandler(uploadMultipleImageController)
 );
 
-mediaRouter.post('/upload-video', wrapRequestHandler(uploadVideoController));
+mediaRouter.post('/upload-video', accessTokenValidator, verifyUserValidator, wrapRequestHandler(uploadVideoController));
 export default mediaRouter;
