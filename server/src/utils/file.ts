@@ -51,12 +51,13 @@ export const handleUploadVideo = async (req: Request) => {
     keepExtensions: true, // khi upload thi lay duoi mo rong,
     maxFileSize: 50 * 1024 * 1024, // 50MB
     filter: function ({ name, originalFilename, mimetype }) {
-      // keep only images
-      //name la key
-      // const valid = name === 'image' && Boolean(mimetype && mimetype.includes('image'));
-      // if (!valid) {
-      //   form.emit('error' as any, new Error('File type is invalid') as any);
-      // }
+      // keep only video
+      // name la key
+      const valid =
+        name === 'video' && Boolean(mimetype && (mimetype.includes('mp4') || mimetype.includes('quicktime')));
+      if (!valid) {
+        form.emit('error' as any, new Error('File type is invalid') as any);
+      }
       return true;
     }
   });
