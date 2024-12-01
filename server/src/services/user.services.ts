@@ -307,6 +307,7 @@ class UsersService {
     });
     return data as IGoogleUser;
   };
+
   oauth = async (code: string) => {
     //dung code thong qua google api de lay id_token va access token
     const { id_token, access_token } = await this.getOauthGoogleToken(code);
@@ -350,6 +351,25 @@ class UsersService {
       });
       return { ...result, newUser: true };
     }
+  };
+
+  refreshTokens = async (user_id: string, verify: EUserVerifyStatus, token: string) => {
+    const tokenPayLoad = {
+      user_id: user_id,
+      verify: verify
+    };
+    const [access_token, refresh_token] = await Promise.all([
+      this.signAccessToken(tokenPayLoad),
+      this.signRefreshToken(tokenPayLoad),
+      databaseService.refreshTokens.deleteOne({ token: token })
+    ]);
+    await databaseService.refreshTokens.insertOne(
+      new RefreshTokens({
+        token: refresh_token,
+        user_id: new ObjectId(user_id)
+      })
+    );
+    return { access_token, refresh_token };
   };
 }
 

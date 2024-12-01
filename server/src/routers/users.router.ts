@@ -6,6 +6,7 @@ import {
   loginController,
   logoutController,
   oauthController,
+  refreshTokenController,
   registerController,
   resendEmailVerifyController,
   resetPasswordController,
@@ -102,5 +103,8 @@ usersRouter.delete(
 
 //login google
 usersRouter.get('/oauth/google', wrapRequestHandler(oauthController));
+
+//refresh_token
+usersRouter.post('/refresh-token', refreshTokenValidator, wrapRequestHandler(refreshTokenController));
 
 export default usersRouter;

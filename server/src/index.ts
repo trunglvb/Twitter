@@ -15,11 +15,6 @@ initFolder();
 dotenv.config();
 databaseService.connect().catch(console.dir);
 app.use(express.json()); // parse sang dang json de xu ly body gui len
-//error handler
-app.use(defaultError);
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
 
 //route
 app.use('/api/users', usersRouter);
@@ -29,3 +24,9 @@ app.use('/static', streamingRoute);
 //static path
 app.use('/static/image', express.static(UPLOAD_IMAGE_DIR));
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
+
+//error handler
+app.use(defaultError);
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});

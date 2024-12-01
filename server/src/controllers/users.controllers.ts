@@ -21,6 +21,9 @@ type ILoginBody = Pick<IRegisterRequestBody, 'email' | 'password'>;
 type IForgotPasswordBody = {
   email: string;
 };
+type IRefreshTokenBody = {
+  refresh_token: string;
+};
 type IResetPasswordBody = {
   forgot_password_token: string;
   password: string;
@@ -203,6 +206,20 @@ const oauthController = async (req: Request, res: Response, _next: NextFunction)
   return res.redirect(urlRedirect);
 };
 
+const refreshTokenController = async (
+  req: Request<ParamsDictionary, any, IRefreshTokenBody>,
+  res: Response,
+  _next: NextFunction
+) => {
+  const { refresh_token } = req.body;
+  const { user_id, verify } = req.decode_refresh_token!;
+  const result = await userService.refreshTokens(user_id, verify, refresh_token);
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'Refresh token success',
+    result: result
+  });
+};
+
 export {
   loginController,
   registerController,
@@ -215,5 +232,6 @@ export {
   updateProfile,
   followedUserController,
   unfollowUserController,
-  oauthController
+  oauthController,
+  refreshTokenController
 };
