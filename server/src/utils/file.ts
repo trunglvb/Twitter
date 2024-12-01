@@ -49,7 +49,7 @@ export const handleUploadVideo = async (req: Request) => {
     uploadDir: UPLOAD_VIDEO_DIR,
     maxFiles: 1,
     keepExtensions: true, // khi upload thi lay duoi mo rong,
-    maxFileSize: 50 * 1024 * 1024, // 50MB
+    maxFileSize: 250 * 1024 * 1024, // 250MB
     filter: function ({ name, originalFilename, mimetype }) {
       // keep only video
       // name la key

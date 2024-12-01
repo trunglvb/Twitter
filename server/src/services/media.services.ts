@@ -17,7 +17,7 @@ class MediaService {
     return {
       url: IS_PRODUCTION
         ? `${process.env.SERVER_HOST}/uploads/${newName}`
-        : `http://localhost:${process.env.PORT}/uploads/video/${newName}`,
+        : `http://localhost:${process.env.PORT}/static/video/${newName}`,
       type: MediaType.Video
     };
   };
@@ -35,7 +35,7 @@ class MediaService {
         return {
           url: IS_PRODUCTION
             ? `${process.env.SERVER_HOST}/uploads/${newName}.jpg`
-            : `http://localhost:${process.env.PORT}/uploads/image/${newName}.jpg`,
+            : `http://localhost:${process.env.PORT}/static/image/${newName}.jpg`,
           type: MediaType.Image
         };
       })

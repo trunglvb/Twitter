@@ -43,9 +43,12 @@ export default function Home() {
 	}, [params]);
 	return (
 		<div>
-			<Button>
+			{/* <Button>
 				<Link to={url}>Login Google</Link>
-			</Button>
+			</Button> */}
+			<video controls width={300}>
+				<source src="http://localhost:4000/static/video-stream/33699eaf6980bd7f101018700.MP4"></source>
+			</video>
 		</div>
 	);
 }

@@ -17,11 +17,9 @@ const MainLayout = (props: IMainLayoutProps) => {
 						</div>
 					</div>
 					<div className="col-span-7">
-						<div className="grid grid-cols-7">
-							{/* <div className="col-span-4">4</div>
+						{/* <div className="col-span-4">4</div>
 							<div className="col-span-3">3</div> */}
-							{children}
-						</div>
+						{children}
 					</div>
 				</div>
 			</div>
