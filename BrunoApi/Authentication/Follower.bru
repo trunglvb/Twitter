@@ -1,0 +1,21 @@
+meta {
+  name: Follower
+  type: http
+  seq: 11
+}
+
+post {
+  url: http://localhost:4000/api/users/follower
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcyY2Q3NzllNDgzNjc4NGZhYWE2NzVmIiwidmVyaWZ5IjoxLCJ0b2tlbl90eXBlIjowLCJpYXQiOjE3MzEyNDcwMjIsImV4cCI6MTczMTI0ODgyMn0.FIeQ1URxcZlPEnBy_gmBDdqBaCVno8OrykWFfYQhCSA
+}
+
+body:json {
+  {
+      "followed_user_id": "672cd783e4836784faaa6761"
+  }
+}

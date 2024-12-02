@@ -1,0 +1,22 @@
+meta {
+  name: UpdateProfile
+  type: http
+  seq: 10
+}
+
+patch {
+  url: http://localhost:4000/api/users/update-me
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcyY2Q3NzllNDgzNjc4NGZhYWE2NzVmIiwidmVyaWZ5IjoxLCJ0b2tlbl90eXBlIjowLCJpYXQiOjE3MzEzMzYzNjksImV4cCI6MTczMTMzODE2OX0.cgXZaFItzgPSAqZ20MViaW_7Np2f_wiLvkL4Fydn8E0
+}
+
+body:json {
+  {
+      "username": "trung123243",
+      "bio": "test_bio_0921"
+  }
+}

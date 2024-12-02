@@ -1,0 +1,15 @@
+meta {
+  name: ResentEmailVerify
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:4000/api/users/resend-email-verify-token
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcwZDNmYjgyNTEzOWZiNDY1NWJkNGFlIiwidG9rZW5fdHlwZSI6MCwiaWF0IjoxNzMwMTI1MTk1LCJleHAiOjE3MzAxMjY5OTV9.uiAPy110Quzsg5ALoa2rxE-VB9tOAX71XYItN1AFM1c
+}

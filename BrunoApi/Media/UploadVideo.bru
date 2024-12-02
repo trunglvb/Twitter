@@ -1,0 +1,19 @@
+meta {
+  name: UploadVideo
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:4000/api/media/upload-video
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcyY2Q3NzllNDgzNjc4NGZhYWE2NzVmIiwidmVyaWZ5IjoxLCJ0b2tlbl90eXBlIjowLCJpYXQiOjE3MzI5NjY4MTIsImV4cCI6MTczMjk2ODYxMn0.8-ui3SjkXj9boC0FGJcAV3UxcqbSS5A5HuW0oIbLvbE
+}
+
+body:multipart-form {
+  video: @file(/Users/trunglvb/Downloads/RPReplay_Final1717223560.MP4)
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Logout
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:4000/api/users/logout
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcwZDNmYjgyNTEzOWZiNDY1NWJkNGFlIiwidG9rZW5fdHlwZSI6MCwiaWF0IjoxNzI5NzgyMDE4LCJleHAiOjE3Mjk3ODIwNzh9.QAGh4Io0KTC6H_OmVBHfvVsLKgnzIG3hLOObDJDMuIE
+}
+
+body:json {
+  {
+      "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcwZDNmYjgyNTEzOWZiNDY1NWJkNGFlIiwidG9rZW5fdHlwZSI6MSwiaWF0IjoxNzI5NzgyMDE4LCJleHAiOjE3Mzg0MjIwMTh9.u9zaD0sBaxF5K4nzjtebSJ8pAIpCIuFL-nps-aFukXI"
+  }
+}
