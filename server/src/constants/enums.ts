@@ -81,3 +81,22 @@ export enum MediaType {
   Image,
   Video
 }
+
+export enum EncodingStatus {
+  Pending, // đang chờ ở hàng đợi, chưa được encode
+  Processing, // Đang encode
+  Success, // Encode thành công
+  Failed // Encode thất bại
+}
+
+export enum ETweetType {
+  Tweet,
+  Retweet,
+  Comment,
+  QuoteTweet
+}
+
+export enum ETweetAudience {
+  Everyone,
+  TweeterCircle
+}
