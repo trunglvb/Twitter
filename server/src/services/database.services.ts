@@ -28,6 +28,14 @@ class DatabaseService {
     }
   }
 
+  //indexs
+
+  indexUsers() {
+    this.users.createIndex({ email: 1, password: 1 });
+    this.users.createIndex({ email: 1 }, { unique: true });
+    this.users.createIndex({ username: 1 }, { unique: true });
+  }
+
   //getter, truy cap gia trị của db collection ở nơi khác bằng cách sử dụng databaseService.users
   get users(): Collection<User> {
     return this.db.collection('users');

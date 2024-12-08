@@ -8,12 +8,16 @@ import { defaultError } from '@/middlewares/error.middleware';
 import mediaRouter from '@/routers/media.route';
 import { initFolder } from '@/utils/file';
 import { UPLOAD_IMAGE_DIR, UPLOAD_STATIC_DIR, UPLOAD_VIDEO_DIR } from '@/constants/dir';
-import { streamingVideoController } from '@/controllers/streaming.controllers';
 import streamingRoute from '@/routers/streaming.route';
 
 initFolder();
 dotenv.config();
-databaseService.connect().catch(console.dir);
+databaseService
+  .connect()
+  .then(() => {
+    databaseService.indexUsers();
+  })
+  .catch(console.dir);
 app.use(express.json()); // parse sang dang json de xu ly body gui len
 
 //route
