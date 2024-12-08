@@ -10,6 +10,7 @@ import { signToken } from '@/utils/jwt';
 import { config } from 'dotenv';
 import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
+import { generateFromEmail } from 'unique-username-generator';
 
 config();
 class UsersService {
@@ -74,7 +75,8 @@ class UsersService {
         _id: user_id,
         email_verify_token: emailVerifyToken,
         date_of_birth: new Date(payload.date_of_birth),
-        password: hashPassword(payload.password)
+        password: hashPassword(payload.password),
+        username: generateFromEmail(payload.email, 3)
       })
     );
     const [access_token, refresh_token] = await Promise.all([
