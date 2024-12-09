@@ -6,7 +6,7 @@ import RefreshTokens from '@/models/schemas/refreshTokens.schema';
 import User from '@/models/schemas/users.schema';
 import databaseService from '@/services/database.services';
 import { hashPassword } from '@/utils/crypto';
-import { signToken } from '@/utils/jwt';
+import { signToken, verifyToken } from '@/utils/jwt';
 import { config } from 'dotenv';
 import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
@@ -14,6 +14,13 @@ import { generateFromEmail } from 'unique-username-generator';
 
 config();
 class UsersService {
+  private decodeRefreshToken = (refresh_token: string) => {
+    return verifyToken({
+      token: refresh_token,
+      privateKey: process.env.JWT_SECRET_REFRESHTOKEN!
+    });
+  };
+
   signAccessToken = async ({ user_id, verify }: { user_id: string; verify: EUserVerifyStatus }) =>
     signToken({
       payload: {
@@ -26,8 +33,19 @@ class UsersService {
         expiresIn: process.env.ACCESS_TOKEN_EXPRIRE_IN
       }
     });
-  signRefreshToken = async ({ user_id, verify }: { user_id: string; verify: EUserVerifyStatus }) =>
-    signToken({
+  signRefreshToken = async ({ user_id, verify, exp }: { user_id: string; verify: EUserVerifyStatus; exp?: number }) => {
+    if (exp) {
+      return signToken({
+        payload: {
+          user_id,
+          verify,
+          token_type: ETokenType.RefreshToken,
+          exp
+        },
+        privateKey: process.env.JWT_SECRET_REFRESHTOKEN as string
+      });
+    }
+    return signToken({
       payload: {
         user_id,
         verify,
@@ -38,6 +56,8 @@ class UsersService {
         expiresIn: process.env.REFRESH_TOKEN_EXPRIRE_IN
       }
     });
+  };
+
   signEmailVerifyToken = async ({ user_id, verify }: { user_id: string; verify: EUserVerifyStatus }) =>
     signToken({
       payload: {
@@ -50,6 +70,7 @@ class UsersService {
         expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPRIE_IN
       }
     });
+
   signForgotPasswordToken = async ({ user_id, verify }: { user_id: string; verify: EUserVerifyStatus }) =>
     signToken({
       payload: {
@@ -83,10 +104,13 @@ class UsersService {
       this.signAccessToken(tokenPayLoad),
       this.signRefreshToken(tokenPayLoad)
     ]);
+    const decodeRefreshToken = await this.decodeRefreshToken(refresh_token);
     await databaseService.refreshTokens.insertOne(
       new RefreshTokens({
         token: refresh_token,
-        user_id: user_id
+        user_id: user_id,
+        iat: decodeRefreshToken.iat,
+        exp: decodeRefreshToken.exp
       })
     );
     return { access_token, refresh_token };
@@ -101,21 +125,27 @@ class UsersService {
       this.signAccessToken(tokenPayLoad),
       this.signRefreshToken(tokenPayLoad)
     ]);
+    const decodeRefreshToken = await this.decodeRefreshToken(refreshToken);
     await databaseService.refreshTokens.insertOne(
       new RefreshTokens({
         token: refreshToken,
-        user_id: _id as ObjectId
+        user_id: _id as ObjectId,
+        iat: decodeRefreshToken.iat,
+        exp: decodeRefreshToken.exp
       })
     );
     return { accessToken, refreshToken, user };
   };
+
   logout = async (refresh_token: string) => {
     await databaseService.refreshTokens.deleteOne({ token: refresh_token });
   };
+
   checkEmailExist = async (email: string) => {
     const user = await databaseService.users.findOne({ email });
     return Boolean(user);
   };
+
   verifyEmail = async (user_id: string) => {
     const tokenPayLoad = {
       user_id: user_id?.toString(),
@@ -134,14 +164,18 @@ class UsersService {
       this.signAccessToken(tokenPayLoad),
       this.signRefreshToken(tokenPayLoad)
     ]);
+    const decodeRefreshToken = await this.decodeRefreshToken(refreshToken);
     await databaseService.refreshTokens.insertOne(
       new RefreshTokens({
         token: refreshToken,
-        user_id: new ObjectId(user_id)
+        user_id: new ObjectId(user_id),
+        iat: decodeRefreshToken.iat,
+        exp: decodeRefreshToken.exp
       })
     );
     return { accessToken, refreshToken };
   };
+
   resendEmailVerify = async (user_id: string) => {
     //B1: send email
     const tokenPayLoad = {
@@ -163,6 +197,7 @@ class UsersService {
       ]
     );
   };
+
   updateForgotPasswordToken = async (user: User) => {
     const { _id, verify } = user;
     const tokenPayLoad = {
@@ -187,6 +222,7 @@ class UsersService {
     // https://twiter.com/fotgot-password?token=${token}
     return true;
   };
+
   resetPassword = async (user_id: string, new_password: string) => {
     await databaseService.users.updateOne(
       {
@@ -334,10 +370,13 @@ class UsersService {
         this.signAccessToken(tokenPayLoad),
         this.signRefreshToken(tokenPayLoad)
       ]);
+      const decodeRefreshToken = await this.decodeRefreshToken(refresh_token);
       await databaseService.refreshTokens.insertOne(
         new RefreshTokens({
           token: refresh_token,
-          user_id: alreadyUser._id
+          user_id: alreadyUser._id,
+          iat: decodeRefreshToken.iat,
+          exp: decodeRefreshToken.exp
         })
       );
       return { access_token, refresh_token, newUser: false };
@@ -355,20 +394,23 @@ class UsersService {
     }
   };
 
-  refreshTokens = async (user_id: string, verify: EUserVerifyStatus, token: string) => {
+  refreshTokens = async (user_id: string, verify: EUserVerifyStatus, token: string, exp: number) => {
     const tokenPayLoad = {
       user_id: user_id,
       verify: verify
     };
     const [access_token, refresh_token] = await Promise.all([
       this.signAccessToken(tokenPayLoad),
-      this.signRefreshToken(tokenPayLoad),
+      this.signRefreshToken({ ...tokenPayLoad, exp }),
       databaseService.refreshTokens.deleteOne({ token: token })
     ]);
+    const decodeRefreshToken = await this.decodeRefreshToken(refresh_token);
     await databaseService.refreshTokens.insertOne(
       new RefreshTokens({
         token: refresh_token,
-        user_id: new ObjectId(user_id)
+        user_id: new ObjectId(user_id),
+        iat: decodeRefreshToken.iat,
+        exp: decodeRefreshToken.exp
       })
     );
     return { access_token, refresh_token };

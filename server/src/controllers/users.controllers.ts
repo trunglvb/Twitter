@@ -212,8 +212,8 @@ const refreshTokenController = async (
   _next: NextFunction
 ) => {
   const { refresh_token } = req.body;
-  const { user_id, verify } = req.decode_refresh_token!;
-  const result = await userService.refreshTokens(user_id, verify, refresh_token);
+  const { user_id, verify, exp } = req.decode_refresh_token!;
+  const result = await userService.refreshTokens(user_id, verify, refresh_token, exp);
   return res.status(HttpStatusCode.Ok).json({
     message: 'Refresh token success',
     result: result
