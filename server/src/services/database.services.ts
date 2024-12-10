@@ -36,6 +36,20 @@ class DatabaseService {
     this.users.createIndex({ username: 1 }, { unique: true });
   }
 
+  indexRefreshToken() {
+    this.refreshTokens.createIndex({ token: 1 });
+    this.refreshTokens.createIndex(
+      { exp: 1 },
+      {
+        expireAfterSeconds: 0 //remove data exp of database
+      }
+    );
+  }
+
+  indexFollower() {
+    this.followers.createIndex({ user_id: 1, followed_user_id: 1 });
+  }
+
   //getter, truy cap gia trị của db collection ở nơi khác bằng cách sử dụng databaseService.users
   get users(): Collection<User> {
     return this.db.collection('users');

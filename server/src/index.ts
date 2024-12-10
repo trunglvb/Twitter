@@ -16,6 +16,8 @@ databaseService
   .connect()
   .then(() => {
     databaseService.indexUsers();
+    databaseService.indexRefreshToken();
+    databaseService.indexFollower();
   })
   .catch(console.dir);
 app.use(express.json()); // parse sang dang json de xu ly body gui len
