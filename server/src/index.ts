@@ -9,6 +9,7 @@ import mediaRouter from '@/routers/media.route';
 import { initFolder } from '@/utils/file';
 import { UPLOAD_IMAGE_DIR, UPLOAD_STATIC_DIR, UPLOAD_VIDEO_DIR } from '@/constants/dir';
 import streamingRoute from '@/routers/streaming.route';
+import tweetRouter from '@/routers/tweet.route';
 
 initFolder();
 dotenv.config();
@@ -25,6 +26,7 @@ app.use(express.json()); // parse sang dang json de xu ly body gui len
 //route
 app.use('/api/users', usersRouter);
 app.use('/api/media', mediaRouter);
+app.use('/api/tweet', tweetRouter);
 app.use('/static', streamingRoute);
 
 //static path
