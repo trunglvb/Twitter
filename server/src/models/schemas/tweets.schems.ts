@@ -17,7 +17,7 @@ interface ITweetType {
   updated_at?: Date;
 }
 
-export default class Tweet {
+export default class Tweets {
   _id?: ObjectId;
   user_id: ObjectId;
   type: ETweetType;

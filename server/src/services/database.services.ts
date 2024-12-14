@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import User from '@/models/schemas/users.schema';
 import RefreshTokens from '@/models/schemas/refreshTokens.schema';
 import Followers from '@/models/schemas/follower.schema';
+import Tweets from '@/models/schemas/tweets.schems';
 dotenv.config();
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter.6nmgf.mongodb.net/`;
@@ -60,6 +61,10 @@ class DatabaseService {
 
   get followers(): Collection<Followers> {
     return this.db.collection('followers');
+  }
+
+  get tweets(): Collection<Tweets> {
+    return this.db.collection('tweets');
   }
 }
 

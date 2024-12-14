@@ -8,7 +8,6 @@ const createTweetController = async (
   res: Response,
   _next: NextFunction
 ) => {
-  const { user } = req;
   return res.status(HttpStatusCode.Ok).json({
     message: 'success',
     result: ''
