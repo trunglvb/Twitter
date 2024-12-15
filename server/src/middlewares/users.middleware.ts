@@ -520,7 +520,6 @@ const updateMeValidator = validate(
         trim: true,
         custom: {
           options: async (val: string) => {
-            console.log('val', val);
             if (!USERNAME_REGEX.test(val)) {
               throw new Error('Username is invalid');
             }

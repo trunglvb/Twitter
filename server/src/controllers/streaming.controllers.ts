@@ -42,7 +42,6 @@ export const streamingVideoController = (req: Request, res: Response, next: Next
   videoStreams.pipe(res);
 
   videoStreams.on('error', (error) => {
-    console.error('Stream error:', error);
     if (!res.headersSent) {
       res.status(HttpStatusCode.InternalServerError).send('Stream error');
     }

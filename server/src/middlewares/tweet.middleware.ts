@@ -35,7 +35,6 @@ export const createSchemaValidator = validate(
       parent_id: {
         custom: {
           options: (value, { req }) => {
-            console.log(enumToArray(ETweetType));
             const body = req.body as ICreateTweetBody;
             const type = body.type;
             if (
