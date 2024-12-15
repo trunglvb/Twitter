@@ -1,5 +1,6 @@
 import { HttpStatusCode } from '@/constants/enums';
 import { ICreateTweetBody } from '@/models/requests/tweet.request';
+import tweetServices from '@/services/tweet.services';
 import { NextFunction, Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
@@ -8,9 +9,12 @@ const createTweetController = async (
   res: Response,
   _next: NextFunction
 ) => {
+  const user_id = req.decode_access_token?.user_id;
+  const { body } = req;
+  const result = await tweetServices.create({ body, user_id: user_id! });
   return res.status(HttpStatusCode.Ok).json({
-    message: 'success',
-    result: ''
+    message: 'Create tweet successfully',
+    result: result
   });
 };
 
