@@ -1,5 +1,5 @@
 import { ETweetAudience, ETweetType } from '@/constants/enums';
-import { MediaType } from 'express';
+import { IMedia } from '@/models/types/media.types';
 
 export type ICreateTweetBody = {
   type: ETweetType;
@@ -8,5 +8,5 @@ export type ICreateTweetBody = {
   parent_id: null | string; // chỉ null khi tweet gốc, không thì là tweet_id.
   hashtags: string[]; // tên của hashtag dạng ['aaa', 'reabbbctjs']
   mentions: string[]; // user_id[]
-  medias: MediaType[];
+  medias: IMedia[];
 };
