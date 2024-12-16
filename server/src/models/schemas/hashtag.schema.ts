@@ -11,7 +11,7 @@ export default class Hashtags {
   created_at: Date;
 
   constructor(hastag: IHashtagType) {
-    this._id = hastag._id;
+    this._id = hastag._id || new ObjectId();
     this.name = hastag.name;
     this.created_at = hastag.created_at ?? new Date();
   }
