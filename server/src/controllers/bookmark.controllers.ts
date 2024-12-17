@@ -12,8 +12,10 @@ const createBookmarkController = async (
   const { body } = req;
   const user_id = req.decode_access_token?.user_id;
   const result = await bookmarkService.createBookmark({ user_id: user_id!, tweet_id: body.tweet_id });
+
   return res.status(HttpStatusCode.Ok).json({
-    message: 'Create tweet successfully'
+    message: 'Create bookmark successfully',
+    result: result
   });
 };
 
