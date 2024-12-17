@@ -2,7 +2,6 @@ import { ICreateTweetBody } from '@/models/requests/tweet.request';
 import Hashtags from '@/models/schemas/hashtag.schema';
 import Tweets from '@/models/schemas/tweets.schems';
 import databaseService from '@/services/database.services';
-import { after } from 'lodash';
 import { ObjectId, WithId } from 'mongodb';
 
 interface ICreateTweetPayload {
