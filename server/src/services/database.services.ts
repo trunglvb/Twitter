@@ -80,6 +80,10 @@ class DatabaseService {
   get bookmark(): Collection<Bookmarks> {
     return this.db.collection('bookmarks');
   }
+
+  get likes(): Collection<Bookmarks> {
+    return this.db.collection('likes');
+  }
 }
 
 const databaseService = new DatabaseService();

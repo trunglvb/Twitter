@@ -11,6 +11,7 @@ import { UPLOAD_IMAGE_DIR, UPLOAD_STATIC_DIR, UPLOAD_VIDEO_DIR } from '@/constan
 import streamingRoute from '@/routers/streaming.route';
 import tweetRouter from '@/routers/tweet.route';
 import bookmarksRouter from '@/routers/bookmark.route';
+import likesRouter from '@/routers/like.route';
 
 initFolder();
 dotenv.config();
@@ -30,6 +31,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/media', mediaRouter);
 app.use('/api/tweet', tweetRouter);
 app.use('/api/bookmark', bookmarksRouter);
+app.use('/api/like', likesRouter);
 app.use('/static', streamingRoute);
 
 //static path
