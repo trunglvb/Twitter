@@ -53,6 +53,10 @@ class DatabaseService {
     this.followers.createIndex({ user_id: 1, followed_user_id: 1 });
   }
 
+  indexBookmark() {
+    this.users.createIndex({ user_id: 1, tweet_id: 1 });
+  }
+
   //getter, truy cap gia trị của db collection ở nơi khác bằng cách sử dụng databaseService.users
   get users(): Collection<User> {
     return this.db.collection('users');
