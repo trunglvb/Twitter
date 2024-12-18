@@ -1,4 +1,4 @@
-import { createBookmarkController } from '@/controllers/bookmark.controllers';
+import { createBookmarkController, unBookmarkController } from '@/controllers/bookmark.controllers';
 import { accessTokenValidator, verifyUserValidator } from '@/middlewares/users.middleware';
 import { wrapRequestHandler } from '@/utils/handlers';
 import express from 'express';
@@ -9,6 +9,13 @@ bookmarksRouter.post(
   accessTokenValidator,
   verifyUserValidator,
   wrapRequestHandler(createBookmarkController)
+);
+
+bookmarksRouter.delete(
+  '/tweets/:tweet_id',
+  accessTokenValidator,
+  verifyUserValidator,
+  wrapRequestHandler(unBookmarkController)
 );
 
 export default bookmarksRouter;

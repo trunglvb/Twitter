@@ -28,6 +28,15 @@ class BookmarkService {
     );
     return result;
   };
+
+  unBookmark = async (payload: ICreateBookmarkPayload) => {
+    const { user_id, tweet_id } = payload;
+    const result = await databaseService.bookmark.findOneAndDelete({
+      user_id: new ObjectId(user_id),
+      tweet_id: new ObjectId(tweet_id)
+    });
+    return result;
+  };
 }
 
 const bookmarkService = new BookmarkService();
