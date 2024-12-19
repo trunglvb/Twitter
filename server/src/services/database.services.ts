@@ -6,6 +6,7 @@ import Followers from '@/models/schemas/follower.schema';
 import Tweets from '@/models/schemas/tweets.schems';
 import Hashtags from '@/models/schemas/hashtag.schema';
 import Bookmarks from '@/models/schemas/bookmark.schema';
+import Likes from '@/models/schemas/likes.schema';
 dotenv.config();
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter.6nmgf.mongodb.net/`;
@@ -81,7 +82,7 @@ class DatabaseService {
     return this.db.collection('bookmarks');
   }
 
-  get likes(): Collection<Bookmarks> {
+  get likes(): Collection<Likes> {
     return this.db.collection('likes');
   }
 }

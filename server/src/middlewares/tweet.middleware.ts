@@ -109,3 +109,34 @@ export const createSchemaValidator = validate(
     ['body']
   )
 );
+
+export const tweetIdValidator = validate(
+  checkSchema(
+    {
+      tweet_id: {
+        trim: true,
+        custom: {
+          options: async (value: string) => {
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus({
+                status: HttpStatusCode.NotFound,
+                message: 'Tweet id is invalid'
+              });
+            }
+            const tweet = await databaseService.tweets.findOne({
+              _id: new ObjectId(value)
+            });
+            if (tweet == null) {
+              throw new ErrorWithStatus({
+                message: 'Tweet not found',
+                status: HttpStatusCode.NotFound
+              });
+            }
+            return true;
+          }
+        }
+      }
+    },
+    ['params', 'body']
+  )
+);
