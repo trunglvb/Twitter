@@ -28,6 +28,7 @@ class TweetService {
     );
     return hashtagDocument?.map((i) => i?._id);
   };
+
   create = async (payload: ICreateTweetPayload) => {
     const { body, user_id } = payload;
     const hashtagIds = await this.checkAndCreateHashtags(body.hashtags);
@@ -45,6 +46,10 @@ class TweetService {
     );
     const tweet = databaseService.tweets.findOne({ _id: result.insertedId });
     return tweet;
+  };
+
+  getTweet = async (tweet_id: string) => {
+    const tweet = await databaseService.tweets.findOne({ _id: new ObjectId(tweet_id) });
   };
 }
 
