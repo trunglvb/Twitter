@@ -13,6 +13,7 @@ interface IUserType {
   forgot_password_token?: string; //jwt hoac "" neu da xac thuc
   verify?: EUserVerifyStatus;
   filePath?: string;
+  tweeter_circle?: ObjectId[]; // danh sach nguoi co the xem bai viet
 
   //optional
   bio?: string;
@@ -40,6 +41,7 @@ export default class User {
   username: string;
   avatar: string;
   cover_photo: string;
+  tweeter_circle: ObjectId[];
 
   constructor(user: IUserType) {
     const initDate = new Date();
@@ -60,5 +62,6 @@ export default class User {
     this.username = user.username ?? '';
     this.avatar = user.avatar ?? '';
     this.cover_photo = user.cover_photo ?? '';
+    this.tweeter_circle = user.tweeter_circle ?? [];
   }
 }
