@@ -116,7 +116,7 @@ export const tweetIdValidator = validate(
       tweet_id: {
         trim: true,
         custom: {
-          options: async (value: string) => {
+          options: async (value: string, { req }) => {
             if (!ObjectId.isValid(value)) {
               throw new ErrorWithStatus({
                 status: HttpStatusCode.NotFound,
@@ -126,6 +126,7 @@ export const tweetIdValidator = validate(
             const tweet = await databaseService.tweets.findOne({
               _id: new ObjectId(value)
             });
+            req.tweet = tweet;
             if (tweet == null) {
               throw new ErrorWithStatus({
                 message: 'Tweet not found',
@@ -148,4 +149,13 @@ export const isUserLoginedValidator = (middleWareFunc: (req: Request, res: Respo
     }
     next();
   };
+};
+
+export const audienceValidator = (req: Request, res: Response, next: NextFunction) => {
+  const tweet = req.tweet!;
+  const audienceType = tweet?.audience;
+  if (audienceType === ETweetAudience.TweeterCircle) {
+    //kiem tra nguoi xem tweet nay da dang nhap hay chua
+  }
+  next();
 };
