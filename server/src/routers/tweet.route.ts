@@ -1,4 +1,4 @@
-import { tweetIdValidator } from './../middlewares/tweet.middleware';
+import { isUserLoginedValidator, tweetIdValidator } from './../middlewares/tweet.middleware';
 import { createTweetController, getTweetController } from '@/controllers/tweet.controllers';
 import { createSchemaValidator } from '@/middlewares/tweet.middleware';
 import { accessTokenValidator, verifyUserValidator } from '@/middlewares/users.middleware';
@@ -15,6 +15,12 @@ tweetRouter.post(
 );
 
 //get tweet
-tweetRouter.get('/:tweet_id', tweetIdValidator, wrapRequestHandler(getTweetController));
+tweetRouter.get(
+  '/:tweet_id',
+  tweetIdValidator,
+  isUserLoginedValidator(accessTokenValidator),
+  isUserLoginedValidator(verifyUserValidator),
+  wrapRequestHandler(getTweetController)
+);
 
 export default tweetRouter;

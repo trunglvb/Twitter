@@ -140,3 +140,12 @@ export const tweetIdValidator = validate(
     ['params', 'body']
   )
 );
+
+export const isUserLoginedValidator = (middleWareFunc: (req: Request, res: Response, next: NextFunction) => void) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (req.headers.authorization) {
+      return middleWareFunc(req, res, next);
+    }
+    next();
+  };
+};

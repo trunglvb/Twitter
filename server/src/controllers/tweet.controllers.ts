@@ -18,7 +18,7 @@ const createTweetController = async (
   });
 };
 
-const getTweetController = async (req: Request, res: Response, next: NextFunction) => {
+const getTweetController = async (req: Request, res: Response, _next: NextFunction) => {
   const { tweet_id } = req.params;
   const result = await tweetServices.getTweet(tweet_id);
   return res.status(HttpStatusCode.Ok).json({
