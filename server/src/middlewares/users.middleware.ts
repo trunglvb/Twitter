@@ -6,7 +6,7 @@ import { ErrorWithStatus } from '@/utils/errors';
 import { verifyToken } from '@/utils/jwt';
 import validate from '@/utils/validation';
 import { checkSchema } from 'express-validator';
-import { JsonWebTokenError } from 'jsonwebtoken';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { ObjectId } from 'mongodb';
 import { NextFunction, Request, Response } from 'express';
@@ -153,7 +153,7 @@ const accessTokenValidator = validate(
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
-                  message: 'Access token is invalid',
+                  message: 'Token expired',
                   status: HttpStatusCode.Unauthorized
                 });
               }
