@@ -1,4 +1,4 @@
-import { ETweetAudience, ETweetType, HttpStatusCode } from '@/constants/enums';
+import { ETweetAudience, ETweetType, EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
 import { ICreateTweetBody } from '@/models/requests/tweet.request';
 import databaseService from '@/services/database.services';
 import { enumToArray, isMediaCheck } from '@/utils/common';
@@ -151,11 +151,37 @@ export const isUserLoginedValidator = (middleWareFunc: (req: Request, res: Respo
   };
 };
 
-export const audienceValidator = (req: Request, res: Response, next: NextFunction) => {
+//muốn dùng async trong handler express thì phải có trycatch không thì phải dùng wrap
+export const audienceValidator = async (req: Request, res: Response, next: NextFunction) => {
   const tweet = req.tweet!;
   const audienceType = tweet?.audience;
   if (audienceType === ETweetAudience.TweeterCircle) {
     //kiem tra nguoi xem tweet nay da dang nhap hay chua
+    if (!req.decode_access_token) {
+      throw new ErrorWithStatus({
+        status: HttpStatusCode.Unauthorized,
+        message: 'Access token is require'
+      });
+    }
+    const user_id = req.decode_access_token?.user_id;
+    //kiem tra tai khoan tac gia có bị khoá hay bị cấm không
+    const author = await databaseService.users.findOne({
+      _id: new ObjectId(tweet._id)
+    });
+    if (!author || author.verify === EUserVerifyStatus.Banned) {
+      throw new ErrorWithStatus({
+        status: HttpStatusCode.NotFound,
+        message: 'User not found'
+      });
+    }
+    //kiem tra nguoi xem tweet nay co trong Tweet_circle cua tac gia khong
+    const isInTweeterCircle = author?.tweeter_circle.some((id) => id.equals(req.decode_access_token?.user_id));
+    if (!isInTweeterCircle || !author._id.equals(user_id)) {
+      throw new ErrorWithStatus({
+        status: HttpStatusCode.Forbidden,
+        message: 'Tweet is not publish'
+      });
+    }
   }
   next();
 };
