@@ -166,7 +166,7 @@ export const audienceValidator = async (req: Request, res: Response, next: NextF
     const user_id = req.decode_access_token?.user_id;
     //kiem tra tai khoan tac gia có bị khoá hay bị cấm không
     const author = await databaseService.users.findOne({
-      _id: new ObjectId(tweet._id)
+      _id: new ObjectId(tweet.user_id)
     });
     if (!author || author.verify === EUserVerifyStatus.Banned) {
       throw new ErrorWithStatus({
@@ -175,8 +175,9 @@ export const audienceValidator = async (req: Request, res: Response, next: NextF
       });
     }
     //kiem tra nguoi xem tweet nay co trong Tweet_circle cua tac gia khong
-    const isInTweeterCircle = author?.tweeter_circle.some((id) => id.equals(req.decode_access_token?.user_id));
-    if (!isInTweeterCircle || !author._id.equals(user_id)) {
+    //hoac co phai tac gia hay khong
+    const isInTweeterCircle = author?.tweeter_circle.some((id) => id.equals(user_id));
+    if (!author._id.equals(user_id) && !isInTweeterCircle) {
       throw new ErrorWithStatus({
         status: HttpStatusCode.Forbidden,
         message: 'Tweet is not publish'
