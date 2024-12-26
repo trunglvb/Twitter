@@ -1,0 +1,21 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:4000/api/bookmark/create
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcyY2Q3NzllNDgzNjc4NGZhYWE2NzVmIiwidmVyaWZ5IjoxLCJ0b2tlbl90eXBlIjowLCJpYXQiOjE3MzQ1MzQ2NTcsImV4cCI6MTczNDUzNjQ1N30.AzZ1PgYhs5WvbMXBj-r8S3HJZDMbjU6tYkHNBmV8838
+}
+
+body:json {
+  {
+    "tweet_id": "67604beff9e41377cb47c8f7"
+  }
+}

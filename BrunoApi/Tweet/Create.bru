@@ -1,0 +1,27 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:4000/api/tweet/create
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjcyY2Q3NzllNDgzNjc4NGZhYWE2NzVmIiwidmVyaWZ5IjoxLCJ0b2tlbl90eXBlIjowLCJpYXQiOjE3MzUxMzY1NzEsImV4cCI6MTczNTEzODM3MX0.3PdMsGNjBn6uFRQeaunQYjw9jqaPwpRU4diDASQJJJ8
+}
+
+body:json {
+  {
+    "type": 0, 
+    "audience": 1, 
+    "content": "Test tweet with circle",
+    "parent_id": null,
+    "hashtags": ["reactjs", "vuejs"],
+    "mentions": [],
+    "medias": []
+  }
+}
