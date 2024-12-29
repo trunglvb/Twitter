@@ -48,9 +48,28 @@ class TweetService {
     return tweet;
   };
 
-  getTweet = async (tweet_id: string) => {
-    const tweet = await databaseService.tweets.findOne({ _id: new ObjectId(tweet_id) });
-    return tweet;
+  increaseView = async (tweet_id: string, user_id: string) => {
+    const inc = user_id ? { user_views: 1 } : { guest_views: 1 };
+    const result = await databaseService.tweets.findOneAndUpdate(
+      {
+        _id: new ObjectId(tweet_id)
+      },
+      {
+        //increase
+        $inc: inc,
+        $currentDate: {
+          updated_at: true
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: {
+          user_views: 1,
+          guest_views: 1
+        }
+      }
+    );
+    return result as WithId<{ user_views: number; guest_views: number; _id: ObjectId }>;
   };
 }
 

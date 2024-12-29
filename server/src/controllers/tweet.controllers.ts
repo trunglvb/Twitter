@@ -20,10 +20,13 @@ const createTweetController = async (
 
 const getTweetController = async (req: Request, res: Response, _next: NextFunction) => {
   const { tweet_id } = req.params;
-  const result = await tweetServices.getTweet(tweet_id);
+  const user_id = req.decode_access_token?.user_id!;
+  const viewResult = await tweetServices.increaseView(tweet_id, user_id);
+  const tweet = { ...req.tweet, user_views: viewResult.user_views, guest_views: viewResult.guest_views };
+  console.log(tweet);
   return res.status(HttpStatusCode.Ok).json({
     message: 'Get tweet successfully',
-    result: result
+    result: tweet
   });
 };
 
