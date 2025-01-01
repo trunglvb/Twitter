@@ -47,10 +47,11 @@ const getTweetChilrenController = async (
   return res.status(HttpStatusCode.Ok).json({
     message: 'Get tweet children successfully',
     result: {
-      tweets: result,
+      tweets: result.result,
       type,
       page,
-      limit
+      limit,
+      totalCount: result.totalCount
     }
   });
 };

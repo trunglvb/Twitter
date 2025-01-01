@@ -123,7 +123,11 @@ class TweetService {
         }
       ])
       .toArray();
-    return result;
+    const totalCount = await databaseService.tweets.countDocuments({
+      parent_id: new ObjectId(tweet_id),
+      type: type
+    });
+    return { result, totalCount };
   };
 }
 
