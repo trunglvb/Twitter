@@ -1,4 +1,5 @@
-import { ICreateTweetBody } from '@/models/requests/tweet.request';
+import { ETweetType } from './../constants/enums';
+import { ICreateTweetBody, IGetTweetChilrenBody } from '@/models/requests/tweet.request';
 import Hashtags from '@/models/schemas/hashtag.schema';
 import Tweets from '@/models/schemas/tweets.schems';
 import databaseService from '@/services/database.services';
@@ -44,7 +45,7 @@ class TweetService {
         user_id: new ObjectId(user_id)
       })
     );
-    const tweet = databaseService.tweets.findOne({ _id: result.insertedId });
+    const tweet = await databaseService.tweets.findOne({ _id: result.insertedId });
     return tweet;
   };
 
@@ -70,6 +71,59 @@ class TweetService {
       }
     );
     return result as WithId<{ user_views: number; guest_views: number; _id: ObjectId }>;
+  };
+
+  getTweetChildren = async (payload: IGetTweetChilrenBody) => {
+    const { tweet_id, type, limit, page } = payload;
+    const result = await databaseService.tweets
+      .aggregate<Tweets>([
+        {
+          $match: {
+            parent_id: new ObjectId(tweet_id),
+            type: type
+          }
+        },
+        {
+          $lookup: {
+            from: 'hashtags',
+            localField: 'hashtags',
+            foreignField: '_id',
+            as: 'hashtags'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'mentions',
+            foreignField: '_id',
+            as: 'mentions'
+          }
+        },
+        {
+          $addFields: {
+            mentions: {
+              $map: {
+                input: '$mentions',
+                as: 'mention',
+                in: {
+                  _id: '$$mention._id',
+                  name: '$$mention.name',
+                  email: '$$mention.email',
+                  username: '$$mention.username'
+                }
+              }
+            }
+          }
+        },
+        {
+          $skip: limit * (page - 1)
+        },
+        {
+          $limit: limit
+        }
+      ])
+      .toArray();
+    return result;
   };
 }
 

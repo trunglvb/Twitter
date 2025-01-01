@@ -10,3 +10,10 @@ export type ICreateTweetBody = {
   mentions: string[]; // user_id[]
   medias: IMedia[];
 };
+
+export type IGetTweetChilrenBody = {
+  tweet_id: string;
+  type: ETweetType;
+  page: number;
+  limit: number;
+};

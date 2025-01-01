@@ -1,5 +1,5 @@
 import { audienceValidator, isUserLoginedValidator, tweetIdValidator } from './../middlewares/tweet.middleware';
-import { createTweetController, getTweetController } from '@/controllers/tweet.controllers';
+import { createTweetController, getTweetChilrenController, getTweetController } from '@/controllers/tweet.controllers';
 import { createSchemaValidator } from '@/middlewares/tweet.middleware';
 import { accessTokenValidator, verifyUserValidator } from '@/middlewares/users.middleware';
 import { wrapRequestHandler } from '@/utils/handlers';
@@ -22,6 +22,17 @@ tweetRouter.get(
   isUserLoginedValidator(verifyUserValidator),
   wrapRequestHandler(audienceValidator),
   wrapRequestHandler(getTweetController)
+);
+
+//get tweet children
+//need limit, page, tweet_type
+tweetRouter.post(
+  '/:tweet_id/children',
+  tweetIdValidator,
+  isUserLoginedValidator(accessTokenValidator),
+  isUserLoginedValidator(verifyUserValidator),
+  wrapRequestHandler(audienceValidator),
+  wrapRequestHandler(getTweetChilrenController)
 );
 
 export default tweetRouter;
