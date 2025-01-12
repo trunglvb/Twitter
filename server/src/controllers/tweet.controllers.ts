@@ -24,7 +24,12 @@ const getTweetController = async (req: Request, res: Response, _next: NextFuncti
   const { tweet_id } = req.params;
   const user_id = req.decode_access_token?.user_id!;
   const viewResult = await tweetServices.increaseView(tweet_id, user_id);
-  const tweet = { ...req.tweet, user_views: viewResult.user_views, guest_views: viewResult.guest_views };
+  const tweet = {
+    ...req.tweet,
+    user_views: viewResult.user_views,
+    guest_views: viewResult.guest_views,
+    updated_at: viewResult.updated_at
+  };
   return res.status(HttpStatusCode.Ok).json({
     message: 'Get tweet successfully',
     result: tweet
@@ -37,9 +42,11 @@ const getTweetChilrenController = async (
   _next: NextFunction
 ) => {
   const { tweet_id } = req.params;
+  const user_id = req.decode_access_token?.user_id!;
   const { page, limit, type } = req.body;
   const result = await tweetServices.getTweetChildren({
     tweet_id,
+    user_id,
     type: type,
     limit: limit || defaultPagination.limit,
     page: page || defaultPagination.page

@@ -27,7 +27,7 @@ tweetRouter.get(
 //get tweet children
 //need limit, page, tweet_type
 tweetRouter.post(
-  '/:tweet_id/children',
+  '/children/:tweet_id',
   tweetIdValidator,
   isUserLoginedValidator(accessTokenValidator),
   isUserLoginedValidator(verifyUserValidator),

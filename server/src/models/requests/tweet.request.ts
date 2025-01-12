@@ -13,6 +13,7 @@ export type ICreateTweetBody = {
 
 export type IGetTweetChilrenBody = {
   tweet_id: string;
+  user_id?: string;
   type: ETweetType;
   page: number;
   limit: number;
