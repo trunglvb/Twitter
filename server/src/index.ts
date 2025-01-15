@@ -12,6 +12,7 @@ import streamingRoute from '@/routers/streaming.route';
 import tweetRouter from '@/routers/tweet.route';
 import bookmarksRouter from '@/routers/bookmark.route';
 import likesRouter from '@/routers/like.route';
+// import '@/utils/faker';
 
 initFolder();
 dotenv.config();

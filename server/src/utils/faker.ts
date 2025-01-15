@@ -16,7 +16,7 @@ const PASSWORD = 'Baotrung0311@';
 const MYID = new ObjectId('6755ace700e5dc08a6cb44d9');
 
 //so luong user duoc tao, moi user mac dinh 2 tweet
-const USER_COUNT = 100;
+const USER_COUNT = 200;
 
 export const createRandomUser = () => {
   const user: IRegisterRequestBody = {
@@ -46,7 +46,7 @@ export const createRandomTweet = () => {
 };
 
 export const users: IRegisterRequestBody[] = faker.helpers.multiple(createRandomUser, {
-  count: 100
+  count: USER_COUNT
 });
 
 const insertMultipleUsers = async (users: IRegisterRequestBody[]) => {
