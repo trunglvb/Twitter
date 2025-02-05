@@ -28,7 +28,8 @@ const getTweetController = async (req: Request, res: Response, _next: NextFuncti
     ...req.tweet,
     user_views: viewResult.user_views,
     guest_views: viewResult.guest_views,
-    updated_at: viewResult.updated_at
+    updated_at: viewResult.updated_at,
+    views: viewResult.user_views + viewResult.guest_views
   };
   return res.status(HttpStatusCode.Ok).json({
     message: 'Get tweet successfully',

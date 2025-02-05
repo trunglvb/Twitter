@@ -1,5 +1,6 @@
 import { ETweetAudience, ETweetType, EUserVerifyStatus, HttpStatusCode } from '@/constants/enums';
 import { ICreateTweetBody } from '@/models/requests/tweet.request';
+import Tweets from '@/models/schemas/tweets.schems';
 import databaseService from '@/services/database.services';
 import { enumToArray, isMediaCheck } from '@/utils/common';
 import { ErrorWithStatus } from '@/utils/errors';
@@ -123,9 +124,123 @@ export const tweetIdValidator = validate(
                 message: 'Tweet id is invalid'
               });
             }
-            const tweet = await databaseService.tweets.findOne({
-              _id: new ObjectId(value)
-            });
+            const [tweet] = await databaseService.tweets
+              .aggregate<Tweets>([
+                {
+                  $match: {
+                    _id: new ObjectId(value)
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'hashtags',
+                    localField: 'hashtags',
+                    foreignField: '_id',
+                    as: 'hashtags'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'users',
+                    localField: 'mentions',
+                    foreignField: '_id',
+                    as: 'mentions'
+                  }
+                },
+                {
+                  $addFields: {
+                    mentions: {
+                      $map: {
+                        input: '$mentions',
+                        as: 'mention',
+                        in: {
+                          _id: '$$mention._id',
+                          name: '$$mention.name',
+                          username: '$$mention.username',
+                          email: '$$mention.email'
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'tweet_id',
+                    as: 'likes'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'bookmarks',
+                    localField: '_id',
+                    foreignField: 'tweet_id',
+                    as: 'bookmarks'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'tweets',
+                    localField: '_id',
+                    foreignField: 'parent_id',
+                    as: 'tweet_childrens'
+                  }
+                },
+                {
+                  $addFields: {
+                    bookmarks: {
+                      $size: '$bookmarks'
+                    },
+                    likes: {
+                      $size: '$likes'
+                    },
+                    retweet_count: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_childrens',
+                          as: 'item',
+                          cond: {
+                            $eq: ['$$item.type', 1]
+                          }
+                        }
+                      }
+                    },
+                    comment_count: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_childrens',
+                          as: 'item',
+                          cond: {
+                            $eq: ['$$item.type', 2]
+                          }
+                        }
+                      }
+                    },
+                    quoteTweet_count: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_childrens',
+                          as: 'item',
+                          cond: {
+                            $eq: ['$$item.type', 3]
+                          }
+                        }
+                      }
+                    },
+                    views: {
+                      $add: ['$user_views', '$guest_views']
+                    }
+                  }
+                },
+                {
+                  $project: {
+                    tweet_childrens: 0
+                  }
+                }
+              ])
+              .toArray();
+
             req.tweet = tweet;
             if (tweet == null) {
               throw new ErrorWithStatus({
@@ -151,10 +266,12 @@ export const isUserLoginedValidator = (middleWareFunc: (req: Request, res: Respo
   };
 };
 
-//muốn dùng async trong handler express thì phải có trycatch không thì phải dùng wrap
+//muốn dùng async trong handler express thì phải có trycatch mới có thể bắt được lỗi không thì phải dùng wrap => nêú không có sẽ crash app
 export const audienceValidator = async (req: Request, res: Response, next: NextFunction) => {
   const tweet = req.tweet!;
+  console.log('req.decode_access_token', req.decode_access_token);
   const audienceType = tweet?.audience;
+  console.log('audienceType', audienceType);
   if (audienceType === ETweetAudience.TweeterCircle) {
     //kiem tra nguoi xem tweet nay da dang nhap hay chua
     if (!req.decode_access_token) {

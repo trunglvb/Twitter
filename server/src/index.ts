@@ -7,7 +7,7 @@ import databaseService from '@/services/database.services';
 import { defaultError } from '@/middlewares/error.middleware';
 import mediaRouter from '@/routers/media.route';
 import { initFolder } from '@/utils/file';
-import { UPLOAD_IMAGE_DIR, UPLOAD_STATIC_DIR, UPLOAD_VIDEO_DIR } from '@/constants/dir';
+import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '@/constants/dir';
 import streamingRoute from '@/routers/streaming.route';
 import tweetRouter from '@/routers/tweet.route';
 import bookmarksRouter from '@/routers/bookmark.route';
