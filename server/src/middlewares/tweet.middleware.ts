@@ -303,3 +303,41 @@ export const audienceValidator = async (req: Request, res: Response, next: NextF
   }
   next();
 };
+
+export const getTweetChildrenValidator = validate(
+  checkSchema(
+    {
+      type: {
+        isIn: {
+          options: [ETweetType],
+          errorMessage: 'Tweet type is invalid'
+        }
+      },
+      limit: {
+        isNumeric: true,
+        custom: {
+          options: async (value) => {
+            const num = Number(value);
+            if (num < 1 || num > 100) {
+              throw new Error('1 <= limit <= 100');
+            }
+            return true;
+          }
+        }
+      },
+      page: {
+        isNumeric: true,
+        custom: {
+          options: async (value) => {
+            const num = Number(value);
+            if (num < 1) {
+              throw new Error('Page must be >= 1');
+            }
+            return true;
+          }
+        }
+      }
+    },
+    ['body']
+  )
+);

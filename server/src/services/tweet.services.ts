@@ -1,4 +1,3 @@
-import { ETweetType } from './../constants/enums';
 import { ICreateTweetBody, IGetTweetChilrenBody } from '@/models/requests/tweet.request';
 import Hashtags from '@/models/schemas/hashtag.schema';
 import Tweets from '@/models/schemas/tweets.schems';
