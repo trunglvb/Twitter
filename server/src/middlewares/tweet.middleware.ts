@@ -6,7 +6,7 @@ import { enumToArray, isMediaCheck } from '@/utils/common';
 import { ErrorWithStatus } from '@/utils/errors';
 import validate from '@/utils/validation';
 import { Request, Response, NextFunction } from 'express';
-import { checkSchema } from 'express-validator';
+import { body, checkSchema } from 'express-validator';
 import { isEmpty } from 'lodash';
 import { ObjectId } from 'mongodb';
 
@@ -201,7 +201,7 @@ export const tweetIdValidator = validate(
                           input: '$tweet_childrens',
                           as: 'item',
                           cond: {
-                            $eq: ['$$item.type', 1]
+                            $eq: ['$$item.type', ETweetType.Retweet]
                           }
                         }
                       }
@@ -212,7 +212,7 @@ export const tweetIdValidator = validate(
                           input: '$tweet_childrens',
                           as: 'item',
                           cond: {
-                            $eq: ['$$item.type', 2]
+                            $eq: ['$$item.type', ETweetType.Comment]
                           }
                         }
                       }
@@ -223,7 +223,7 @@ export const tweetIdValidator = validate(
                           input: '$tweet_childrens',
                           as: 'item',
                           cond: {
-                            $eq: ['$$item.type', 3]
+                            $eq: ['$$item.type', ETweetType.QuoteTweet]
                           }
                         }
                       }
@@ -269,9 +269,7 @@ export const isUserLoginedValidator = (middleWareFunc: (req: Request, res: Respo
 //muốn dùng async trong handler express thì phải có trycatch mới có thể bắt được lỗi không thì phải dùng wrap => nêú không có sẽ crash app
 export const audienceValidator = async (req: Request, res: Response, next: NextFunction) => {
   const tweet = req.tweet!;
-  console.log('req.decode_access_token', req.decode_access_token);
   const audienceType = tweet?.audience;
-  console.log('audienceType', audienceType);
   if (audienceType === ETweetAudience.TweeterCircle) {
     //kiem tra nguoi xem tweet nay da dang nhap hay chua
     if (!req.decode_access_token) {
@@ -304,15 +302,9 @@ export const audienceValidator = async (req: Request, res: Response, next: NextF
   next();
 };
 
-export const getTweetChildrenValidator = validate(
+export const paginationValidator = validate(
   checkSchema(
     {
-      type: {
-        isIn: {
-          options: [ETweetType],
-          errorMessage: 'Tweet type is invalid'
-        }
-      },
       limit: {
         isNumeric: true,
         custom: {
@@ -335,6 +327,20 @@ export const getTweetChildrenValidator = validate(
             }
             return true;
           }
+        }
+      }
+    },
+    ['body']
+  )
+);
+
+export const getTweetChildrenValidator = validate(
+  checkSchema(
+    {
+      type: {
+        isIn: {
+          options: [ETweetType],
+          errorMessage: 'Tweet type is invalid'
         }
       }
     },

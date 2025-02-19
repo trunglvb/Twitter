@@ -2,9 +2,15 @@ import {
   audienceValidator,
   getTweetChildrenValidator,
   isUserLoginedValidator,
+  paginationValidator,
   tweetIdValidator
 } from './../middlewares/tweet.middleware';
-import { createTweetController, getTweetChilrenController, getTweetController } from '@/controllers/tweet.controllers';
+import {
+  createTweetController,
+  getNewFeedsController,
+  getTweetChilrenController,
+  getTweetController
+} from '@/controllers/tweet.controllers';
 import { createSchemaValidator } from '@/middlewares/tweet.middleware';
 import { accessTokenValidator, verifyUserValidator } from '@/middlewares/users.middleware';
 import { wrapRequestHandler } from '@/utils/handlers';
@@ -21,7 +27,7 @@ tweetRouter.post(
 
 //get tweet
 tweetRouter.get(
-  '/:tweet_id',
+  '/detail/:tweet_id',
   tweetIdValidator,
   isUserLoginedValidator(accessTokenValidator),
   isUserLoginedValidator(verifyUserValidator),
@@ -34,6 +40,7 @@ tweetRouter.get(
 tweetRouter.post(
   '/children/:tweet_id',
   tweetIdValidator,
+  paginationValidator,
   getTweetChildrenValidator,
   isUserLoginedValidator(accessTokenValidator),
   isUserLoginedValidator(verifyUserValidator),
@@ -44,8 +51,10 @@ tweetRouter.post(
 //get new feeds
 tweetRouter.post(
   '/new-feeds',
-  isUserLoginedValidator(accessTokenValidator),
-  isUserLoginedValidator(verifyUserValidator)
+  paginationValidator,
+  accessTokenValidator,
+  verifyUserValidator,
+  wrapRequestHandler(getNewFeedsController)
 );
 
 export default tweetRouter;

@@ -64,4 +64,21 @@ const getTweetChilrenController = async (
   });
 };
 
-export { createTweetController, getTweetController, getTweetChilrenController };
+const getNewFeedsController = async (
+  req: Request<ParamsDictionary, any, { page: number; limit: number }>,
+  res: Response,
+  _next: NextFunction
+) => {
+  const user_id = req.decode_access_token?.user_id;
+  const result = await tweetServices.getNewFeeds({
+    user_id: user_id,
+    page: 1,
+    limit: 10
+  });
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'Get mew feeds successfully',
+    result: result
+  });
+};
+
+export { createTweetController, getTweetController, getTweetChilrenController, getNewFeedsController };

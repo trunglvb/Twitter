@@ -18,3 +18,9 @@ export type IGetTweetChilrenBody = {
   page: number;
   limit: number;
 };
+
+export type IGetNewFeedsBody = {
+  user_id?: string;
+  page: number;
+  limit: number;
+};

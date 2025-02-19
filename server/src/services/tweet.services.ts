@@ -1,4 +1,5 @@
-import { ICreateTweetBody, IGetTweetChilrenBody } from '@/models/requests/tweet.request';
+import { ETweetType } from '@/constants/enums';
+import { ICreateTweetBody, IGetNewFeedsBody, IGetTweetChilrenBody } from '@/models/requests/tweet.request';
 import Hashtags from '@/models/schemas/hashtag.schema';
 import Tweets from '@/models/schemas/tweets.schems';
 import databaseService from '@/services/database.services';
@@ -153,6 +154,191 @@ class TweetService {
       type: type
     });
     return { result: tweets, totalCount };
+  };
+
+  getNewFeeds = async (payload: IGetNewFeedsBody) => {
+    const { user_id, limit, page } = payload;
+    const inc = user_id ? { user_views: 1 } : { guest_views: 1 };
+    const date = new Date();
+    const follower_user_ids = await databaseService.followers
+      .find(
+        {
+          user_id: new ObjectId(user_id)
+        },
+        {
+          projection: {
+            followed_user_id: 1
+          }
+        }
+      )
+      .toArray();
+    const followerIds = follower_user_ids.map((i) => i.followed_user_id);
+    console.log([new ObjectId(user_id), ...followerIds]);
+    const newfeeds = await databaseService.tweets
+      .aggregate<Tweets>([
+        {
+          $match: {
+            user_id: {
+              $in: [new ObjectId(user_id), ...followerIds]
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user_id',
+            foreignField: '_id',
+            as: 'user'
+          }
+        },
+        {
+          $match: {
+            $or: [
+              {
+                audience: 0
+              },
+              {
+                $and: [
+                  {
+                    audience: 1
+                  },
+                  {
+                    'user.tweeter_circle': {
+                      $in: [new ObjectId(user_id)]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          $lookup: {
+            from: 'hashtags',
+            localField: 'hashtags',
+            foreignField: '_id',
+            as: 'hashtags'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'mentions',
+            foreignField: '_id',
+            as: 'mentions'
+          }
+        },
+        {
+          $addFields: {
+            mentions: {
+              $map: {
+                input: '$mentions',
+                as: 'mention',
+                in: {
+                  _id: '$$mention._id',
+                  name: '$$mention.name',
+                  username: '$$mention.username',
+                  email: '$$mention.email'
+                }
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'likes',
+            localField: '_id',
+            foreignField: 'tweet_id',
+            as: 'likes'
+          }
+        },
+        {
+          $lookup: {
+            from: 'bookmarks',
+            localField: '_id',
+            foreignField: 'tweet_id',
+            as: 'bookmarks'
+          }
+        },
+        {
+          $lookup: {
+            from: 'tweets',
+            localField: '_id',
+            foreignField: 'parent_id',
+            as: 'tweet_childrens'
+          }
+        },
+        {
+          $addFields: {
+            bookmarks: {
+              $size: '$bookmarks'
+            },
+            likes: {
+              $size: '$likes'
+            },
+            retweet_count: {
+              $size: {
+                $filter: {
+                  input: '$tweet_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', ETweetType.Retweet]
+                  }
+                }
+              }
+            },
+            comment_count: {
+              $size: {
+                $filter: {
+                  input: '$tweet_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', ETweetType.Comment]
+                  }
+                }
+              }
+            },
+            quoteTweet_count: {
+              $size: {
+                $filter: {
+                  input: '$tweet_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', ETweetType.QuoteTweet]
+                  }
+                }
+              }
+            },
+            views: {
+              $add: ['$user_views', '$guest_views']
+            }
+          }
+        },
+        {
+          $project: {
+            tweet_childrens: 0,
+            user: {
+              password: 0,
+              email_verify_token: 0,
+              forgot_password_token: 0,
+              tweeter_circle: 0
+            }
+          }
+        },
+        {
+          $unwind: {
+            path: '$user'
+          }
+        },
+        {
+          $skip: limit * (page - 1)
+        },
+        {
+          $limit: limit
+        }
+      ])
+      .toArray();
+    return newfeeds;
   };
 }
 
