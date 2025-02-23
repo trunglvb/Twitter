@@ -295,7 +295,7 @@ class UsersService {
       );
       return { message: 'Follow user success' };
     }
-    return { message: 'Followed' };
+    return { message: 'User has been followed' };
   };
 
   unfollow = async ({ user_id, followed_user_id }: { user_id: string; followed_user_id: string }) => {

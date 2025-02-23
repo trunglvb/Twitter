@@ -158,7 +158,7 @@ class TweetService {
 
   getNewFeeds = async (payload: IGetNewFeedsBody) => {
     const { user_id, limit, page } = payload;
-    const inc = user_id ? { user_views: 1 } : { guest_views: 1 };
+    const inc = { user_views: 1 };
     const date = new Date();
     const follower_user_ids = await databaseService.followers
       .find(
@@ -173,7 +173,7 @@ class TweetService {
       )
       .toArray();
     const followerIds = follower_user_ids.map((i) => i.followed_user_id);
-    console.log([new ObjectId(user_id), ...followerIds]);
+
     const newfeeds = await databaseService.tweets
       .aggregate<Tweets>([
         {
@@ -338,6 +338,31 @@ class TweetService {
         }
       ])
       .toArray();
+
+    const tweet_ids = newfeeds.map((tweet) => tweet._id as ObjectId);
+
+    await databaseService.tweets.updateMany(
+      {
+        _id: {
+          $in: tweet_ids
+        }
+      },
+      {
+        $inc: inc,
+        $set: {
+          updated_at: date
+        }
+      }
+    );
+    newfeeds.forEach((tweet) => {
+      tweet.updated_at = date;
+      if (user_id) {
+        tweet.user_views++;
+      } else {
+        tweet.guest_views++;
+      }
+    });
+
     return newfeeds;
   };
 }
