@@ -40,6 +40,10 @@ class DatabaseService {
     this.users.createIndex({ username: 1 }, { unique: true });
   }
 
+  indexTweets() {
+    this.tweets.createIndex({ content: 'text' });
+  }
+
   indexRefreshToken() {
     this.refreshTokens.createIndex({ token: 1 });
     this.refreshTokens.createIndex(

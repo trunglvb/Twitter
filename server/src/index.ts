@@ -12,6 +12,7 @@ import streamingRoute from '@/routers/streaming.route';
 import tweetRouter from '@/routers/tweet.route';
 import bookmarksRouter from '@/routers/bookmark.route';
 import likesRouter from '@/routers/like.route';
+import searchRouter from '@/routers/search.route';
 // import '@/utils/faker';
 
 initFolder();
@@ -23,6 +24,7 @@ databaseService
     databaseService.indexRefreshToken();
     databaseService.indexFollower();
     databaseService.indexBookmark();
+    databaseService.indexTweets();
   })
   .catch(console.dir);
 app.use(express.json()); // parse sang dang json de xu ly body gui len
@@ -34,6 +36,7 @@ app.use('/api/tweet', tweetRouter);
 app.use('/api/bookmark', bookmarksRouter);
 app.use('/api/like', likesRouter);
 app.use('/static', streamingRoute);
+app.use('/api/search', searchRouter);
 
 //static path
 app.use('/static/image', express.static(UPLOAD_IMAGE_DIR));
