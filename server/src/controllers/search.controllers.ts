@@ -11,15 +11,17 @@ export const searchController = async (
   _next: NextFunction
 ) => {
   const { page = defaultPagination.page, limit = defaultPagination.limit, content } = req.query;
+  const user_id = req.decode_access_token?.user_id;
 
   const result = await searchService.search({
     content: content,
     page: page,
-    limit: limit
+    limit: limit,
+    user_id: user_id
   });
 
   return res.status(HttpStatusCode.Ok).json({
-    message: 'Success',
+    message: 'Get tweets success',
     result: {
       tweets: result,
       page: page,

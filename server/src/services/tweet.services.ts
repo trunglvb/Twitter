@@ -1,4 +1,4 @@
-import { ETweetType } from '@/constants/enums';
+import { ETweetAudience, ETweetType } from '@/constants/enums';
 import { ICreateTweetBody, IGetNewFeedsBody, IGetTweetChilrenBody } from '@/models/requests/tweet.request';
 import Hashtags from '@/models/schemas/hashtag.schema';
 import Tweets from '@/models/schemas/tweets.schems';
@@ -195,12 +195,12 @@ class TweetService {
           $match: {
             $or: [
               {
-                audience: 0
+                audience: ETweetAudience.Everyone
               },
               {
                 $and: [
                   {
-                    audience: 1
+                    audience: ETweetAudience.TweeterCircle
                   },
                   {
                     'user.tweeter_circle': {
@@ -356,11 +356,7 @@ class TweetService {
     );
     newfeeds.forEach((tweet) => {
       tweet.updated_at = date;
-      if (user_id) {
-        tweet.user_views++;
-      } else {
-        tweet.guest_views++;
-      }
+      tweet.user_views++;
     });
 
     return newfeeds;

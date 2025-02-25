@@ -25,6 +25,7 @@ databaseService
     databaseService.indexFollower();
     databaseService.indexBookmark();
     databaseService.indexTweets();
+    databaseService.indexHashtag();
   })
   .catch(console.dir);
 app.use(express.json()); // parse sang dang json de xu ly body gui len

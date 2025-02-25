@@ -62,6 +62,10 @@ class DatabaseService {
     this.users.createIndex({ user_id: 1, tweet_id: 1 });
   }
 
+  indexHashtag() {
+    this.hashtag.createIndex({ name: 'text' });
+  }
+
   //getter, truy cap gia trị của db collection ở nơi khác bằng cách sử dụng databaseService.users
   get users(): Collection<User> {
     return this.db.collection('users');
