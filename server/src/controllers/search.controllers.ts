@@ -15,8 +15,8 @@ export const searchController = async (
 
   const result = await searchService.search({
     content: content,
-    page: page,
-    limit: limit,
+    page: Number(page),
+    limit: Number(limit),
     user_id: user_id
   });
 

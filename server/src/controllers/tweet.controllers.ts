@@ -73,8 +73,8 @@ const getNewFeedsController = async (
   const { page, limit } = req.body;
   const result = await tweetServices.getNewFeeds({
     user_id: user_id,
-    page: page || defaultPagination.page,
-    limit: limit || defaultPagination.limit
+    page: Number(page || defaultPagination.page),
+    limit: Number(limit || defaultPagination.limit)
   });
   return res.status(HttpStatusCode.Ok).json({
     message: 'Get mew feeds successfully',
