@@ -41,7 +41,7 @@ class DatabaseService {
   }
 
   indexTweets() {
-    this.tweets.createIndex({ content: 'text' });
+    this.tweets.createIndex({ content: 'text' }, { default_language: 'none' });
   }
 
   indexRefreshToken() {
