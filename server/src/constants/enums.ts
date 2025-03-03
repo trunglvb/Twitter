@@ -100,3 +100,8 @@ export enum ETweetAudience {
   Everyone,
   TweeterCircle
 }
+
+export enum EPeopleFollow {
+  No,
+  Yes
+}

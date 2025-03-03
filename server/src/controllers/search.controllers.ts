@@ -10,14 +10,20 @@ export const searchController = async (
   res: Response,
   _next: NextFunction
 ) => {
-  const { page = defaultPagination.page, limit = defaultPagination.limit, content } = req.query as ISearchQuery;
+  const {
+    page = defaultPagination.page,
+    limit = defaultPagination.limit,
+    content,
+    people_follow
+  } = req.query as ISearchQuery;
   const user_id = req.decode_access_token?.user_id;
 
   const result = await searchService.search({
     content: content,
     page: Number(page),
     limit: Number(limit),
-    user_id: user_id
+    user_id: user_id,
+    people_follow: people_follow
   });
 
   return res.status(HttpStatusCode.Ok).json({

@@ -1,4 +1,4 @@
-import { ETweetAudience, ETweetType } from '@/constants/enums';
+import { EPeopleFollow, ETweetAudience, ETweetType } from '@/constants/enums';
 import { ISearchQuery } from '@/models/requests/search.request';
 import Tweets from '@/models/schemas/tweets.schems';
 import databaseService from '@/services/database.services';
@@ -6,17 +6,39 @@ import { ObjectId } from 'mongodb';
 
 class SearchService {
   search = async (payload: ISearchQuery) => {
-    const { page, limit, content, user_id } = payload;
+    const { page, limit, content, user_id, people_follow } = payload;
     const inc = { user_views: 1 };
     const date = new Date();
+
+    let $match: any = {
+      $text: {
+        $search: content
+      }
+    };
+
+    if (people_follow && Number(people_follow) === EPeopleFollow.Yes) {
+      const follower_user_ids = await databaseService.followers
+        .find(
+          {
+            user_id: new ObjectId(user_id)
+          },
+          {
+            projection: {
+              followed_user_id: 1,
+              _id: 0
+            }
+          }
+        )
+        .toArray();
+      const followerIds = follower_user_ids.map((i) => i.followed_user_id);
+      console.log('followerIds', followerIds);
+      $match['user_id'] = { $in: [new ObjectId(user_id), ...followerIds] };
+    }
+
     const result = await databaseService.tweets
       .aggregate<Tweets>([
         {
-          $match: {
-            $text: {
-              $search: content
-            }
-          }
+          $match: $match
         },
         {
           $lookup: {
@@ -206,6 +228,9 @@ class SearchService {
             $text: {
               $search: content
             }
+            // loc tweet co chua hinh anh , video
+            // media_type pass from query
+            // 'medias.type': media_type
           }
         },
         {
