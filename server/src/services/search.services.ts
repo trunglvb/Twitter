@@ -31,7 +31,6 @@ class SearchService {
         )
         .toArray();
       const followerIds = follower_user_ids.map((i) => i.followed_user_id);
-      console.log('followerIds', followerIds);
       $match['user_id'] = { $in: [new ObjectId(user_id), ...followerIds] };
     }
 

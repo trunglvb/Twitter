@@ -6,7 +6,7 @@ import { enumToArray, isMediaCheck } from '@/utils/common';
 import { ErrorWithStatus } from '@/utils/errors';
 import validate from '@/utils/validation';
 import { Request, Response, NextFunction } from 'express';
-import { body, checkSchema } from 'express-validator';
+import { checkSchema } from 'express-validator';
 import { isEmpty } from 'lodash';
 import { ObjectId } from 'mongodb';
 
