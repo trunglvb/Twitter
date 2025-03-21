@@ -11,6 +11,7 @@ import { config } from 'dotenv';
 import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
 import { generateFromEmail } from 'unique-username-generator';
+import { sendVerifyEmail } from '@/utils/email';
 
 config();
 class UsersService {
@@ -83,6 +84,7 @@ class UsersService {
         expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPRIE_IN
       }
     });
+
   register = async (payload: IRegisterRequestBody) => {
     const user_id = new ObjectId();
     const tokenPayLoad = {
@@ -113,8 +115,18 @@ class UsersService {
         exp: decodeRefreshToken.exp
       })
     );
+
+    //send email
+    sendVerifyEmail(
+      payload.email,
+      'Xác thực email',
+      `<span>
+        Click <a href="${process.env.CLIENT_URL}/verify-email?token=${emailVerifyToken}">here</a> để xác thực email
+      </span>`
+    );
     return { access_token, refresh_token };
   };
+
   login = async (user: User) => {
     const { _id, verify } = user;
     const tokenPayLoad = {
