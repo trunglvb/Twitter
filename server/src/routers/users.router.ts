@@ -49,17 +49,23 @@ usersRouter.post('/resend-email-verify-token', accessTokenValidator, wrapRequest
 //forgot hashPassword
 //B1: check email valid to update forgot_password_token
 
-usersRouter.post('/forgot-password', forgotPasswordEmailValidator, wrapRequestHandler(forgotPasswordController));
+usersRouter.post(
+  '/forgot-password',
+  accessTokenValidator,
+  forgotPasswordEmailValidator,
+  wrapRequestHandler(forgotPasswordController)
+);
 
 //verify forgotpassword token
 usersRouter.post(
   '/verify-forgot-password',
+  accessTokenValidator,
   forgotPasswordTokenValidator,
   wrapRequestHandler(verifyForgotPasswordTokenController)
 );
 
 //reset password if forgot password
-usersRouter.post('/reset-forgot-password', resetForgotPasswordValidator, wrapRequestHandler(resetPasswordController));
+usersRouter.post('/reset-forgot-password', accessTokenValidator, wrapRequestHandler(resetPasswordController));
 
 //reset password if has logined
 usersRouter.post(

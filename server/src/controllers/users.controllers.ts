@@ -104,7 +104,7 @@ export const resendEmailVerifyController = async (req: Request, res: Response, n
       message: 'Email already verified'
     });
   }
-  await userService.resendEmailVerify(user_id);
+  await userService.resendEmailVerify(user_id, user.email);
   return res.status(HttpStatusCode.Ok).json({
     message: 'Resend email verify success'
   });
@@ -122,6 +122,7 @@ const forgotPasswordController = async (
   });
 };
 
+//after verify => move to reset password page and call resetPasswordController
 const verifyForgotPasswordTokenController = async (
   _req: Request<ParamsDictionary, any, { forgot_password_token: string }>,
   res: Response,

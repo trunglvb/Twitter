@@ -11,7 +11,8 @@ import { config } from 'dotenv';
 import { ObjectId } from 'mongodb';
 import { ErrorWithStatus } from '@/utils/errors';
 import { generateFromEmail } from 'unique-username-generator';
-import { sendVerifyEmail } from '@/utils/email';
+import { sendForgotPasswordVerifyEmail, sendRegisterVerifyEmail, sendVerifyEmail } from '@/utils/email';
+import { send } from 'process';
 
 config();
 class UsersService {
@@ -117,13 +118,8 @@ class UsersService {
     );
 
     //send email
-    sendVerifyEmail(
-      payload.email,
-      'Xác thực email',
-      `<span>
-        Click <a href="${process.env.CLIENT_URL}/verify-email?token=${emailVerifyToken}">here</a> để xác thực email
-      </span>`
-    );
+    await sendRegisterVerifyEmail(payload.email, emailVerifyToken);
+
     return { access_token, refresh_token };
   };
 
@@ -188,7 +184,7 @@ class UsersService {
     return { accessToken, refreshToken };
   };
 
-  resendEmailVerify = async (user_id: string) => {
+  resendEmailVerify = async (user_id: string, email: string) => {
     //B1: send email
     const tokenPayLoad = {
       user_id: user_id?.toString(),
@@ -208,6 +204,8 @@ class UsersService {
         }
       ]
     );
+    //send mail kem link duong dan den verify-email => client se goi post va gui lai email_verify_token len
+    await sendRegisterVerifyEmail(email, email_verify_token);
   };
 
   updateForgotPasswordToken = async (user: User) => {
@@ -231,7 +229,7 @@ class UsersService {
       ]
     );
     //send mail kem link duong dan den verify-forgot-password => client se goi post va gui lai forgot_password_token len
-    // https://twiter.com/fotgot-password?token=${token}
+    await sendForgotPasswordVerifyEmail(user.email, forgot_password_token);
     return true;
   };
 

@@ -1,4 +1,8 @@
+import { Template } from './../../node_modules/@types/ejs/index.d';
 import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
+import ejs from 'ejs';
+import fs from 'fs';
+import path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -56,6 +60,26 @@ export const sendVerifyEmail = (toAddress: string, subject: string, body: string
   });
 
   return sesClient.send(sendEmailCommand);
+};
+
+export const sendRegisterVerifyEmail = async (email: string, emailVerifyToken: string) => {
+  const templatePath = path.resolve('src/views/emailTemplate.ejs');
+  const emailHtml = await ejs.renderFile(templatePath, {
+    name: email?.split('@')[0],
+    clientUrl: process.env.CLIENT_URL,
+    emailVerifyToken: emailVerifyToken
+  });
+  return sendVerifyEmail(email, 'Account Verification', emailHtml);
+};
+
+export const sendForgotPasswordVerifyEmail = async (email: string, forgotPasswordToken: string) => {
+  const templatePath = path.resolve('src/views/forgotPasswordTemplate.ejs');
+  const templateHtml = await ejs.renderFile(templatePath, {
+    name: email?.split('@')[0],
+    clientUrl: process.env.CLIENT_URL,
+    forgotPasswordToken: forgotPasswordToken
+  });
+  return sendVerifyEmail(email, 'Change Password', templateHtml);
 };
 
 // sendVerifyEmail('trunglvb.hust@gmail.com', 'Tiêu đề email', '<h1>Nội dung email</h1>');
