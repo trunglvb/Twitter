@@ -16,14 +16,24 @@ dotenv.config();
 class MediaService {
   handleUploadVideo = async (req: Request) => {
     const files = await handleUploadVideo(req);
-    const newName = files[0]?.newFilename!;
-    return {
-      url: IS_PRODUCTION
-        ? `${process.env.SERVER_HOST}/uploads/${newName}`
-        : `http://localhost:${process.env.PORT}/static/video/${newName}`,
-      type: MediaType.Video
-    };
+
+    console.log('files', files);
+    const result = await Promise.all(
+      files?.map(async (file) => {
+        const s3Result = await uploadFileToS3({
+          fileName: 'videos/' + `${file.newFilename}.mp4`,
+          filePath: file?.filepath,
+          contentType: 'video/mp4'
+        });
+        return {
+          url: s3Result?.Location as string, // Location la duong dan tren s3
+          type: MediaType.Video
+        };
+      })
+    );
+    return result;
   };
+
   handleUploadImageService = async (req: Request, maxFiles: number) => {
     const files = await handleUploadImage(req, maxFiles);
     console.log(files);
@@ -35,7 +45,7 @@ class MediaService {
         //voi image can duong dan tam thoi de resize anh, sau do tao duong dan moi va xoa duong dan temp => sau do xoa duong dan image khi da upload thanh cong len s3
         await sharp(file?.filepath).jpeg({ mozjpeg: true }).toFile(newPath);
         const s3Result = await uploadFileToS3({
-          fileName: `${newName}.jpg`,
+          fileName: 'images/' + `${newName}.jpg`,
           filePath: newPath,
           contentType: mime.getType(newPath) as string
         });
