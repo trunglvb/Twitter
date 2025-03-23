@@ -18,6 +18,7 @@ export const handleUploadImage = async (req: Request, maxFiles: number) => {
   const form = formidable({
     uploadDir: UPLOAD_TEMP_DIR, //tao anh o local
     maxFiles: maxFiles,
+    multiples: true,
     keepExtensions: true, // khi upload thi lay duoi mo rong,
     maxFileSize: maxFiles * 1024 * 500, // 500KB
     filter: function ({ name, originalFilename, mimetype }) {
@@ -49,7 +50,7 @@ export const handleUploadVideo = async (req: Request) => {
     uploadDir: UPLOAD_VIDEO_DIR,
     maxFiles: 1,
     keepExtensions: true, // khi upload thi lay duoi mo rong,
-    maxFileSize: 250 * 1024 * 1024, // 250MB
+    maxFileSize: 2 * 1024 * 1024 * 1024, //
     filter: function ({ name, originalFilename, mimetype }) {
       // keep only video
       // name la key

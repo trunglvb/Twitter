@@ -10,9 +10,10 @@ export const uploadSingleImageController = async (req: Request, res: Response, _
 };
 
 export const uploadMultipleImageController = async (req: Request, res: Response, _next: NextFunction) => {
-  const data = await mediaServices.handleUploadImageService(req, 1);
+  const maxFiles = 10;
+  const data = await mediaServices.handleUploadImageService(req, maxFiles);
   return res.json({
-    message: 'Upload image success',
+    message: 'Upload multiple image success',
     data: data
   });
 };

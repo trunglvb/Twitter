@@ -14,7 +14,6 @@ import bookmarksRouter from '@/routers/bookmark.route';
 import likesRouter from '@/routers/like.route';
 import searchRouter from '@/routers/search.route';
 import cors from 'cors';
-import '@/utils/s3';
 // import '@/utils/faker';
 
 app.use(cors());
