@@ -21,7 +21,7 @@ class MediaService {
       type: MediaType.Video
     };
   };
-  handleUploadImage = async (req: Request, maxFiles: number) => {
+  handleUploadImageService = async (req: Request, maxFiles: number) => {
     const files = await handleUploadImage(req, maxFiles);
     const result: IMedia[] = await Promise.all(
       files?.map(async (file) => {

@@ -22,7 +22,7 @@ export const handleUploadImage = async (req: Request, maxFiles: number) => {
     maxFileSize: maxFiles * 1024 * 500, // 500KB
     filter: function ({ name, originalFilename, mimetype }) {
       // keep only images
-      //name la key
+      //name la key trong api define
       const valid = name === 'image' && Boolean(mimetype && mimetype.includes('image'));
       if (!valid) {
         form.emit('error' as any, new Error('File type is invalid') as any);
