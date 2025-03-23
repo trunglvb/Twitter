@@ -13,8 +13,10 @@ import tweetRouter from '@/routers/tweet.route';
 import bookmarksRouter from '@/routers/bookmark.route';
 import likesRouter from '@/routers/like.route';
 import searchRouter from '@/routers/search.route';
+import cors from 'cors';
 // import '@/utils/faker';
 
+app.use(cors());
 initFolder();
 dotenv.config();
 databaseService

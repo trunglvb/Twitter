@@ -1,6 +1,7 @@
 import path from "@/constants/path";
 import MainLayout from "@/layouts";
 import Home from "@/pages/home";
+import VerifyEmail from "@/pages/verifyEmail";
 
 import { useRoutes } from "react-router-dom";
 
@@ -22,6 +23,14 @@ const useRouteElement = () => {
 				<MainLayout>
 					<Home />
 				</MainLayout>
+			),
+		},
+		{
+			path: path.verifyEmail,
+			element: (
+				<>
+					<VerifyEmail />
+				</>
 			),
 		},
 	]);
