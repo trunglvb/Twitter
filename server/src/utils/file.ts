@@ -16,7 +16,7 @@ export const initFolder = () => {
 
 export const handleUploadImage = async (req: Request, maxFiles: number) => {
   const form = formidable({
-    uploadDir: UPLOAD_TEMP_DIR,
+    uploadDir: UPLOAD_TEMP_DIR, //tao anh o local
     maxFiles: maxFiles,
     keepExtensions: true, // khi upload thi lay duoi mo rong,
     maxFileSize: maxFiles * 1024 * 500, // 500KB

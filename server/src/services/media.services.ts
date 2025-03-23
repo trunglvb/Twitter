@@ -26,11 +26,11 @@ class MediaService {
     const result: IMedia[] = await Promise.all(
       files?.map(async (file) => {
         const newName = getFileName(file?.newFilename);
-        //voi image can duong dan tam thoi de resize anh, sau do tao duong dan moi va xoa dung dan temp
+        //voi image can duong dan tam thoi de resize anh, sau do tao duong dan moi va xoa duong dan temp
         await sharp(file?.filepath)
           .jpeg({ mozjpeg: true, quality: 75 })
           .toFile(path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`));
-        fs.unlinkSync(file.filepath);
+        fs.unlinkSync(file.filepath); // xoa file tren local
 
         return {
           url: IS_PRODUCTION
