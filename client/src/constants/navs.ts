@@ -31,7 +31,7 @@ export const sideBarNavs = [
 	{
 		title: "Messages",
 		icon: Mail,
-		path: "/messages",
+		path: "/chat",
 		variant: "ghost",
 	},
 	{

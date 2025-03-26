@@ -2,6 +2,7 @@ import path from "@/constants/path";
 import MainLayout from "@/layouts";
 import Home from "@/pages/home";
 import VerifyEmail from "@/pages/verifyEmail";
+import Chat from "@/pages/chat";
 
 import { useRoutes } from "react-router-dom";
 
@@ -31,6 +32,14 @@ const useRouteElement = () => {
 				<>
 					<VerifyEmail />
 				</>
+			),
+		},
+		{
+			path: path.chat,
+			element: (
+				<MainLayout>
+					<Chat />
+				</MainLayout>
 			),
 		},
 	]);

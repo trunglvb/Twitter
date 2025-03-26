@@ -1,6 +1,5 @@
 import express from 'express';
 import usersRouter from '@/routers/users.router';
-const app = express();
 const port = 4000;
 import dotenv from 'dotenv';
 import databaseService from '@/services/database.services';
@@ -14,8 +13,13 @@ import bookmarksRouter from '@/routers/bookmark.route';
 import likesRouter from '@/routers/like.route';
 import searchRouter from '@/routers/search.route';
 import cors from 'cors';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 // import '@/utils/faker';
 
+const app = express();
+//socket io
+const httpServer = createServer();
 app.use(cors());
 initFolder();
 dotenv.config();
@@ -47,6 +51,20 @@ app.use('/static/video', express.static(UPLOAD_VIDEO_DIR));
 
 //error handler
 app.use(defaultError);
-app.listen(port, () => {
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: 'http://localhost:5173'
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log(`User connected: ${socket.id}`);
+  socket.on('disconnect', () => {
+    console.log(`User disconnected: ${socket.id}`);
+  });
+});
+
+httpServer.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
