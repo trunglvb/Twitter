@@ -6,6 +6,7 @@ const Chat = () => {
 		// client-side
 		socket.on("connect", () => {
 			console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+			socket.emit("hello", "world"); // gui su kien hello den server voi gia tri la world
 		});
 
 		//tat tab

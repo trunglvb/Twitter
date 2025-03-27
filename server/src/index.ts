@@ -60,6 +60,9 @@ const io = new Server(httpServer, {
 
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
+  socket.on('hello', (arg) => {
+    console.log(arg); // lay gia tri tu client gui len voi su kien hello
+  });
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`);
   });
