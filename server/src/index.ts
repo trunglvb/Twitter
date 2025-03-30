@@ -19,7 +19,7 @@ import { Server } from 'socket.io';
 
 const app = express();
 //socket io
-const httpServer = createServer();
+const httpServer = createServer(app);
 app.use(cors());
 initFolder();
 dotenv.config();
@@ -60,9 +60,7 @@ const io = new Server(httpServer, {
 
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
-  socket.on('hello', (arg) => {
-    console.log(arg); // lay gia tri tu client gui len voi su kien hello
-  });
+  console.log(socket.handshake.auth);
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`);
   });

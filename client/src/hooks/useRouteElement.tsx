@@ -37,9 +37,9 @@ const useRouteElement = () => {
 		{
 			path: path.chat,
 			element: (
-				<MainLayout>
+				<>
 					<Chat />
-				</MainLayout>
+				</>
 			),
 		},
 	]);
