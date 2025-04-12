@@ -58,10 +58,32 @@ const io = new Server(httpServer, {
   }
 });
 
+const users: {
+  [key: string]: {
+    socket_id: string;
+  };
+} = {};
+
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
-  console.log(socket.handshake.auth);
+  const user_id = socket.handshake.auth._id;
+
+  users[user_id] = {
+    socket_id: socket.id
+  };
+
+  socket.on('private message', (data) => {
+    const reciver_socket_id = users[data.to._id].socket_id;
+    console.log(reciver_socket_id);
+    //gửi sự kiện đến người nhận
+    socket.to(reciver_socket_id).emit('receive private message', {
+      content: data.content,
+      from: user_id
+    });
+  });
+
   socket.on('disconnect', () => {
+    delete users[user_id];
     console.log(`User disconnected: ${socket.id}`);
   });
 });
