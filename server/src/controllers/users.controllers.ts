@@ -151,7 +151,16 @@ const getProfileController = async (req: Request, res: Response, _next: NextFunc
   const result = await userService.getProfile(user_id);
   return res.status(HttpStatusCode.Ok).json({
     message: 'Get user infomation success',
-    user: result
+    result: result
+  });
+};
+
+const getProfileByUsernameController = async (req: Request, res: Response, _next: NextFunction) => {
+  const username = req.body.username!;
+  const result = await userService.getProfileByUserName(username);
+  return res.status(HttpStatusCode.Ok).json({
+    message: 'Get user infomation success',
+    result: result
   });
 };
 
@@ -234,5 +243,6 @@ export {
   followedUserController,
   unfollowUserController,
   oauthController,
-  refreshTokenController
+  refreshTokenController,
+  getProfileByUsernameController
 };

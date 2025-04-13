@@ -2,6 +2,7 @@ import {
   emailVerifyTokenController,
   followedUserController,
   forgotPasswordController,
+  getProfileByUsernameController,
   getProfileController,
   loginController,
   logoutController,
@@ -77,6 +78,9 @@ usersRouter.post(
 
 //get profile
 usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getProfileController));
+
+//get profile by username
+usersRouter.post('/profile', wrapRequestHandler(getProfileByUsernameController));
 
 //update profile use patch
 //khi dung patch, gui phan nao vao body thi se cap nhat phan do, khong can gui tat ca cac truong nhu put

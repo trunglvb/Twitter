@@ -54,7 +54,7 @@ app.use(defaultError);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173'
+    origin: 'http://localhost:5173' //client
   }
 });
 
@@ -68,13 +68,18 @@ io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
   const user_id = socket.handshake.auth._id;
 
+  //gán user_id làm key socket.id la value
   users[user_id] = {
     socket_id: socket.id
   };
+  console.log(users);
 
   socket.on('private message', (data) => {
-    const reciver_socket_id = users[data.to._id].socket_id;
-    console.log(reciver_socket_id);
+    console.log(data);
+    //data.to._id là id của người nhận, lấy ra socket id của người nhận
+    const reciver_socket_id = users[data.to._id]?.socket_id;
+    if (!reciver_socket_id) return;
+
     //gửi sự kiện đến người nhận
     socket.to(reciver_socket_id).emit('receive private message', {
       content: data.content,

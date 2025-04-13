@@ -1,8 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import socket from "@/utils/socket";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import {
+	type ChangeEvent,
+	type FormEvent,
+	useEffect,
+	useState,
+	useRef,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
+import { ArrowLeft, MoreHorizontal, ImageIcon, Send } from "lucide-react";
+import { Link } from "react-router-dom";
+import http from "@/utils/http";
+import { ISuccessResponseApi } from "@/types/utils.type";
 
 interface User {
 	_id: string;
@@ -25,64 +35,229 @@ interface User {
 	tweeter_circle: string[];
 }
 
+interface Message {
+	content: string;
+	isSender: boolean;
+	timestamp?: Date;
+}
+
 const Chat = () => {
+	const usernames = ["trunglvbhust574", "Phongtt"];
 	const [value, setValue] = useState("");
-	const [messages, setMessages] = useState([]);
+	const [messages, setMessages] = useState<Message[]>([]);
+	const [recipient, setRecipient] = useState<User>();
+	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		const proflie: User = JSON.parse(localStorage.getItem("profile")!);
+		const profile: User = JSON.parse(localStorage.getItem("profile")!);
 
 		// client-side
 		socket.auth = {
-			_id: proflie?._id,
+			_id: profile?._id,
 		};
 		socket.connect();
 
-		//nhan su kien tu server, chi nguoi dung co id duoc gui tu server moi nhan duoc
+		// Receive private messages
 		socket.on("receive private message", (data) => {
-			setMessages((prev) => [...prev, data.content] as any);
+			setMessages(
+				(prev) =>
+					[
+						...prev,
+						{
+							...data,
+							isSender: false,
+							timestamp: new Date(),
+						},
+					] as Message[]
+			);
 		});
 
-		//ngat ket noi khi sang trang khac
+		// Disconnect when navigating away
 		return () => {
 			socket.disconnect();
 		};
 	}, []);
 
+	useEffect(() => {
+		// Scroll to bottom when messages change
+		scrollToBottom();
+	}, [messages]);
+
+	const scrollToBottom = () => {
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+	};
+
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		if (!value.trim()) return;
+
 		setValue("");
-		//gui di su kien
+		// Send event
 		socket.emit("private message", {
 			content: value,
 			to: {
-				_id: "6755ace700e5dc08a6cb44d9",
+				_id: recipient?._id!,
 			},
+		});
+
+		setMessages(
+			(prev) =>
+				[
+					...prev,
+					{
+						content: value,
+						isSender: true,
+						timestamp: new Date(),
+					},
+				] as Message[]
+		);
+	};
+
+	const formatTime = (date?: Date) => {
+		if (!date) return "";
+		return new Date(date).toLocaleTimeString([], {
+			hour: "2-digit",
+			minute: "2-digit",
+		});
+	};
+
+	const getProfileByUserName = (username: string) => {
+		http.post<ISuccessResponseApi<User>>("/users/profile", {
+			username: username,
+		}).then((res) => {
+			setRecipient(res.data?.result);
+			alert(`Chatting with ${username}`);
 		});
 	};
 
 	return (
-		<div className="flex h-screen flex-col items-center justify-center p-5">
-			<div className="mb-5">
-				{messages?.map((message: any) => (
-					<div key={uuidv4()}>
-						<p>{message}</p>
+		<div className="flex h-screen flex-col bg-white">
+			<div className="flex">
+				{usernames.map((username) => (
+					<div
+						onClick={() => getProfileByUserName(username)}
+						key={username}
+						className="flex items-center border-b border-gray-200 px-4 py-3 hover:bg-gray-100"
+					>
+						<div className="mr-3 h-10 w-10 overflow-hidden rounded-full">
+							<img
+								src="/placeholder.svg?height=40&width=40"
+								alt={username}
+								className="h-full w-full object-cover"
+							/>
+						</div>
+						<div>
+							<h2 className="font-bold text-gray-900">
+								{username}
+							</h2>
+						</div>
 					</div>
 				))}
 			</div>
-			<form onSubmit={handleSubmit} className="w-full">
-				<div className="flex justify-center gap-2">
+			<header className="flex items-center border-b border-gray-200 px-4 py-3">
+				<Link to="/" className="mr-4">
+					<ArrowLeft className="h-5 w-5 text-gray-700" />
+				</Link>
+				<div className="flex flex-1 items-center">
+					<div className="mr-3 h-10 w-10 overflow-hidden rounded-full">
+						<img
+							src={recipient?.avatar}
+							alt={recipient?.name}
+							className="h-full w-full object-cover"
+						/>
+					</div>
+					<div>
+						<h2 className="font-bold text-gray-900">
+							{recipient?.name}
+						</h2>
+						<p className="text-sm text-gray-500">
+							@{recipient?.username}
+						</p>
+					</div>
+				</div>
+				<button className="rounded-full p-2 hover:bg-gray-100">
+					<MoreHorizontal className="h-5 w-5 text-gray-700" />
+				</button>
+			</header>
+
+			{/* Messages */}
+			<div className="flex-1 space-y-3 overflow-y-auto p-4">
+				{messages.length === 0 ? (
+					<div className="flex h-full flex-col items-center justify-center text-gray-500">
+						<p className="text-center">No messages yet</p>
+						<p className="text-center text-sm">
+							Send a message to start the conversation
+						</p>
+					</div>
+				) : (
+					messages.map((message: Message) => (
+						<div
+							key={uuidv4()}
+							className={`flex ${
+								message.isSender
+									? "justify-end"
+									: "justify-start"
+							}`}
+						>
+							<div
+								className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+									message.isSender
+										? "rounded-tr-none bg-blue-500 text-white"
+										: "rounded-tl-none bg-gray-100 text-gray-900"
+								}`}
+							>
+								<p className="break-words">{message.content}</p>
+								<p
+									className={`mt-1 text-xs ${
+										message.isSender
+											? "text-blue-100"
+											: "text-gray-500"
+									}`}
+								>
+									{formatTime(message.timestamp)}
+								</p>
+							</div>
+						</div>
+					))
+				)}
+				<div ref={messagesEndRef} />
+			</div>
+
+			{/* Input */}
+			<div className="border-t border-gray-200 p-3">
+				<form
+					onSubmit={handleSubmit}
+					className="flex items-center gap-2"
+				>
+					<button
+						type="button"
+						className="rounded-full p-2 text-blue-500 hover:bg-gray-100"
+					>
+						<ImageIcon className="h-5 w-5" />
+					</button>
 					<Input
 						type="text"
+						placeholder="Start a new message"
 						onChange={(e: ChangeEvent<HTMLInputElement>) =>
-							setValue(e?.target.value)
+							setValue(e.target.value)
 						}
 						value={value}
-						className="w-1/2"
+						className="flex-1 rounded-full border-gray-200 text-black focus-visible:ring-blue-500 focus-visible:ring-offset-0"
 					/>
-					<Button type="submit">Send</Button>
-				</div>
-			</form>
+					<Button
+						type="submit"
+						size="icon"
+						className={`rounded-full ${
+							value.trim()
+								? "bg-blue-500 hover:bg-blue-600"
+								: "bg-blue-300"
+						}`}
+						disabled={!value.trim()}
+					>
+						<Send className="h-4 w-4" />
+					</Button>
+				</form>
+			</div>
 		</div>
 	);
 };
