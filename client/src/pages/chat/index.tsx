@@ -47,17 +47,16 @@ const Chat = () => {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [recipient, setRecipient] = useState<User>();
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const profile: User = JSON.parse(localStorage.getItem("profile")!);
 
 	useEffect(() => {
-		const profile: User = JSON.parse(localStorage.getItem("profile")!);
-
 		// client-side
 		socket.auth = {
 			_id: profile?._id,
 		};
 		socket.connect();
 
-		// Receive private messages
+		// Receive private messages, chỉ có người nhận có socket_id trùng với socket_id server gửi lên mới nhận đc
 		socket.on("receive private message", (data) => {
 			setMessages(
 				(prev) =>
@@ -95,6 +94,9 @@ const Chat = () => {
 		// Send event
 		socket.emit("private message", {
 			content: value,
+			from: {
+				_id: profile?._id,
+			},
 			to: {
 				_id: recipient?._id!,
 			},

@@ -74,11 +74,19 @@ io.on('connection', (socket) => {
   };
   console.log(users);
 
-  socket.on('private message', (data) => {
+  socket.on('private message', async (data) => {
     console.log(data);
     //data.to._id là id của người nhận, lấy ra socket id của người nhận
     const reciver_socket_id = users[data.to._id]?.socket_id;
     if (!reciver_socket_id) return;
+
+    await databaseService.conversation.insertOne({
+      receiver_id: data.to?._id,
+      sender_id: data.from?._id,
+      updated_at: new Date(),
+      created_at: new Date(),
+      content: data.content
+    });
 
     //gửi sự kiện đến người nhận
     socket.to(reciver_socket_id).emit('receive private message', {
