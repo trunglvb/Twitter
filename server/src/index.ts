@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import express from 'express';
 import usersRouter from '@/routers/users.router';
 const port = 4000;
@@ -15,6 +16,7 @@ import searchRouter from '@/routers/search.route';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import conversationRouter from '@/routers/conversation.route';
 // import '@/utils/faker';
 
 const app = express();
@@ -44,6 +46,7 @@ app.use('/api/bookmark', bookmarksRouter);
 app.use('/api/like', likesRouter);
 app.use('/static', streamingRoute);
 app.use('/api/search', searchRouter);
+app.use('/api/conversation', conversationRouter);
 
 //static path
 app.use('/static/image', express.static(UPLOAD_IMAGE_DIR));
@@ -81,8 +84,8 @@ io.on('connection', (socket) => {
     if (!reciver_socket_id) return;
 
     await databaseService.conversation.insertOne({
-      receiver_id: data.to?._id,
-      sender_id: data.from?._id,
+      receiver_id: new ObjectId(data.to?._id as string),
+      sender_id: new ObjectId(data.from?._id as string),
       updated_at: new Date(),
       created_at: new Date(),
       content: data.content
