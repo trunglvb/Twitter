@@ -15,8 +15,6 @@ const getConversationController = async (req: Request, res: Response, _next: Nex
     page: Number(page)
   });
 
-  console.log(conversations);
-
   return res.status(HttpStatusCode.Ok).json({
     message: 'Get conversations success',
     result: {

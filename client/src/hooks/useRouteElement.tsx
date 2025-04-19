@@ -5,6 +5,7 @@ import VerifyEmail from "@/pages/verifyEmail";
 import Chat from "@/pages/chat";
 
 import { useRoutes } from "react-router-dom";
+import Login from "@/pages/login/Login";
 
 const useRouteElement = () => {
 	const routeElement = useRoutes([
@@ -31,6 +32,14 @@ const useRouteElement = () => {
 			element: (
 				<>
 					<VerifyEmail />
+				</>
+			),
+		},
+		{
+			path: "/login",
+			element: (
+				<>
+					<Login />
 				</>
 			),
 		},

@@ -138,8 +138,9 @@ const accessTokenValidator = validate(
               });
             }
             const accessToken = value?.split(' ')[1];
+            console.log(value);
             if (!accessToken) {
-              throw new ErrorWithStatus({ status: HttpStatusCode.Unauthorized, message: 'Token is invalid' });
+              throw new ErrorWithStatus({ status: HttpStatusCode.Unauthorized, message: 'Token is invalid1' });
             }
             try {
               const decode_access_token = await verifyToken({
@@ -148,7 +149,7 @@ const accessTokenValidator = validate(
               });
               req.decode_access_token = decode_access_token;
               if (decode_access_token == null) {
-                throw new ErrorWithStatus({ status: HttpStatusCode.Unauthorized, message: 'Token is invalid' });
+                throw new ErrorWithStatus({ status: HttpStatusCode.Unauthorized, message: 'Token is invalid2' });
               }
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
@@ -444,7 +445,7 @@ const resetForgotPasswordValidator = validate(
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
-                  message: 'Token is invalid',
+                  message: 'Token is invalid3',
                   status: HttpStatusCode.Unauthorized
                 });
               }
