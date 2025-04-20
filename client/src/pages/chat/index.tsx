@@ -13,27 +13,8 @@ import { ArrowLeft, MoreHorizontal, ImageIcon, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import http from "@/utils/http";
 import { ISuccessResponseApi } from "@/types/utils.type";
-
-interface User {
-	_id: string;
-	name: string;
-	email: string;
-	date_of_birth: Date;
-	password: string;
-	created_at: Date;
-	updated_at: Date;
-	email_verify_token: string;
-	forgot_password_token: string;
-	verify: number;
-	filePath: string;
-	bio: string;
-	location: string;
-	website: string;
-	username: string;
-	avatar: string;
-	cover_photo: string;
-	tweeter_circle: string[];
-}
+import { getAccessTokenFromLocalStorage } from "@/utils/auth";
+import { IUser } from "@/types/auth.type";
 
 interface Message {
 	content: string;
@@ -53,8 +34,8 @@ interface Conversation {
 interface ConversationResponse {
 	conversations: Conversation[];
 	total: number;
-	limit: string; // nếu luôn là số, nên để kiểu number
-	page: string; // nếu luôn là số, nên để kiểu number
+	limit: number;
+	page: number;
 	totalPage: number;
 }
 
@@ -62,12 +43,13 @@ const Chat = () => {
 	const usernames = ["trunglvbhust574", "Phongtt"];
 	const [value, setValue] = useState("");
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [recipient, setRecipient] = useState<User>();
+	const [recipient, setRecipient] = useState<IUser>();
 	const messagesEndRef = useRef<HTMLDivElement>(null);
-	const profile: User = JSON.parse(localStorage.getItem("profile")!);
+	const profile: IUser = JSON.parse(localStorage.getItem("profile")!);
 	const [page, setPage] = useState(1);
 	const [limit, setLimit] = useState(100);
 
+	console.log(getAccessTokenFromLocalStorage());
 	//for socket
 	useEffect(() => {
 		// client-side
@@ -78,7 +60,6 @@ const Chat = () => {
 
 		// Receive private messages, chỉ có người nhận có socket_id trùng với socket_id server gửi lên mới nhận đc
 		socket.on("receive private message", (data) => {
-			console.log(data);
 			setMessages(
 				(prev) =>
 					[
@@ -170,7 +151,7 @@ const Chat = () => {
 	};
 
 	const getProfileByUserName = (username: string) => {
-		http.post<ISuccessResponseApi<User>>("/users/profile", {
+		http.post<ISuccessResponseApi<IUser>>("/users/profile", {
 			username: username,
 		}).then((res) => {
 			setRecipient(res.data?.result);

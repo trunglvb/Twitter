@@ -3,11 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { loginAccount } from "@/apis/auth.api";
-import {
-	saveAccessTokenToLocalStorage,
-	saveProfileToLocalStorage,
-	saveRefreshTokenToLocalStorage,
-} from "@/utils/auth";
 
 const Login = () => {
 	const navigate = useNavigate();
@@ -16,10 +11,7 @@ const Login = () => {
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		loginAccount({ email, password }).then((res) => {
-			saveAccessTokenToLocalStorage(res.data.result.accessToken);
-			saveRefreshTokenToLocalStorage(res.data.result.refreshToken);
-			saveProfileToLocalStorage(res.data.result.user);
+		loginAccount({ email, password }).then(() => {
 			navigate("/");
 		});
 	};

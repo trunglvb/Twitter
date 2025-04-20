@@ -7,7 +7,10 @@ import {
 	saveAccessTokenToLocalStorage,
 	saveRefreshTokenToLocalStorage,
 	getRefreshTokenFromLocalStorage,
+	saveProfileToLocalStorage,
 } from "./auth";
+import { ISuccessResponseApi } from "@/types/utils.type";
+import { IAuthResponse } from "@/types/auth.type";
 
 class Http {
 	instance: AxiosInstance;
@@ -15,6 +18,10 @@ class Http {
 	private refreshToken: string; // luu tren RAM
 	private refreshTokenRequest: Promise<string> | null;
 	constructor() {
+		console.log(
+			"getAccessTokenFromLocalStorage",
+			getAccessTokenFromLocalStorage()
+		);
 		this.accessToken = getAccessTokenFromLocalStorage();
 		this.refreshToken = getRefreshTokenFromLocalStorage();
 		this.refreshTokenRequest = null;
@@ -42,15 +49,20 @@ class Http {
 		this.instance.interceptors.response.use(
 			(response) => {
 				const { url } = response.config; //goi lai api login neu loi token, path cua api
-				if (url === "/login" || url === "/register") {
+				if (url === "/users/login" || url === "/users/login") {
+					console.log("response", response);
 					this.accessToken = (
-						response.data as any
-					)?.data?.access_token;
+						response.data as ISuccessResponseApi<IAuthResponse>
+					)?.result?.accessToken;
 					this.refreshToken = (
-						response.data as any
-					)?.data?.refresh_token;
+						response.data as ISuccessResponseApi<IAuthResponse>
+					)?.result?.refreshToken;
 					saveAccessTokenToLocalStorage(this.accessToken);
 					saveRefreshTokenToLocalStorage(this.refreshToken);
+					saveProfileToLocalStorage(
+						(response.data as ISuccessResponseApi<IAuthResponse>)
+							?.result?.user
+					);
 				} else if (url === "/logout") {
 					this.accessToken = "";
 					this.refreshToken = "";
