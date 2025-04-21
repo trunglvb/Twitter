@@ -138,7 +138,6 @@ const accessTokenValidator = validate(
               });
             }
             const accessToken = value?.split(' ')[1];
-            console.log(value);
             if (!accessToken) {
               throw new ErrorWithStatus({ status: HttpStatusCode.Unauthorized, message: 'Token is invalid1' });
             }
@@ -614,6 +613,38 @@ const unfollowValidator = validate(
   )
 );
 
+const getConversaitonsValidator = validate(
+  checkSchema(
+    {
+      receiver_id: {
+        trim: true,
+        custom: {
+          options: async (value: string, { req }) => {
+            console.log('value', value);
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus({
+                status: HttpStatusCode.NotFound,
+                message: 'User id is invalid'
+              });
+            }
+            const user = await databaseService.users.findOne({
+              _id: new ObjectId(value)
+            });
+            if (user == null) {
+              throw new ErrorWithStatus({
+                message: 'User not found',
+                status: HttpStatusCode.NotFound
+              });
+            }
+            return true;
+          }
+        }
+      }
+    },
+    ['params']
+  )
+);
+
 export {
   loginValidator,
   registerValidator,
@@ -627,5 +658,6 @@ export {
   verifyUserValidator,
   updateMeValidator,
   followValidator,
-  unfollowValidator
+  unfollowValidator,
+  getConversaitonsValidator
 };

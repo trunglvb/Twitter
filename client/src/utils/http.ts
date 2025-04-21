@@ -50,7 +50,6 @@ class Http {
 			(response) => {
 				const { url } = response.config; //goi lai api login neu loi token, path cua api
 				if (url === "/users/login" || url === "/users/login") {
-					console.log("response", response);
 					this.accessToken = (
 						response.data as ISuccessResponseApi<IAuthResponse>
 					)?.result?.accessToken;

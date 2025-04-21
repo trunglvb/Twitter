@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import express from 'express';
-import usersRouter from '@/routers/users.router';
+import usersRouter from '@/routers/users.route';
 const port = 4000;
 import dotenv from 'dotenv';
 import databaseService from '@/services/database.services';
@@ -17,6 +17,7 @@ import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import conversationRouter from '@/routers/conversation.route';
+import Conversations from '@/models/schemas/conversations.schema';
 // import '@/utils/faker';
 
 const app = express();
@@ -75,26 +76,26 @@ io.on('connection', (socket) => {
   users[user_id] = {
     socket_id: socket.id
   };
-  console.log(users);
 
-  socket.on('private message', async (data) => {
-    console.log(data);
-    //data.to._id là id của người nhận, lấy ra socket id của người nhận
-    const reciver_socket_id = users[data.to._id]?.socket_id;
+  socket.on('send_message', async (data) => {
+    const { payload } = data;
+
+    //receiver_id là id của người nhận, lấy ra socket id của người nhận
+    const reciver_socket_id = users[payload.receiver_id]?.socket_id;
     if (!reciver_socket_id) return;
 
-    await databaseService.conversation.insertOne({
-      receiver_id: new ObjectId(data.to?._id as string),
-      sender_id: new ObjectId(data.from?._id as string),
-      updated_at: new Date(),
-      created_at: new Date(),
-      content: data.content
+    const conversation = new Conversations({
+      receiver_id: new ObjectId(payload.receiver_id as string),
+      sender_id: new ObjectId(payload.sender_id as string),
+      content: data.payload?.content
     });
 
+    const result = await databaseService.conversation.insertOne(conversation);
+    conversation._id = result.insertedId;
+
     //gửi sự kiện đến người nhận
-    socket.to(reciver_socket_id).emit('receive private message', {
-      content: data.content,
-      from: user_id
+    socket.to(reciver_socket_id).emit('receive_message', {
+      payload: conversation
     });
   });
 

@@ -20,8 +20,8 @@ const getConversationController = async (req: Request, res: Response, _next: Nex
     result: {
       conversations: conversations.conversation,
       total: conversations.total,
-      limit: limit,
-      page: page,
+      limit: Number(limit),
+      page: Number(page),
       totalPage: Math.ceil(Number(conversations.total) / Number(limit))
     }
   });

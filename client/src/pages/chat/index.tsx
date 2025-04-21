@@ -13,10 +13,11 @@ import { ArrowLeft, MoreHorizontal, ImageIcon, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import http from "@/utils/http";
 import { ISuccessResponseApi } from "@/types/utils.type";
-import { getAccessTokenFromLocalStorage } from "@/utils/auth";
 import { IUser } from "@/types/auth.type";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface Message {
+	_id: string;
 	content: string;
 	isSender: boolean;
 	timestamp?: Date;
@@ -47,9 +48,9 @@ const Chat = () => {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const profile: IUser = JSON.parse(localStorage.getItem("profile")!);
 	const [page, setPage] = useState(1);
-	const [limit, setLimit] = useState(100);
+	const limit = 10;
+	const [totalPage, setTotalPage] = useState(1);
 
-	console.log(getAccessTokenFromLocalStorage());
 	//for socket
 	useEffect(() => {
 		// client-side
@@ -59,15 +60,17 @@ const Chat = () => {
 		socket.connect();
 
 		// Receive private messages, chỉ có người nhận có socket_id trùng với socket_id server gửi lên mới nhận đc
-		socket.on("receive private message", (data) => {
+		socket.on("receive_message", (data) => {
+			const { payload } = data;
 			setMessages(
 				(prev) =>
 					[
 						...prev,
 						{
-							...data,
+							...payload,
 							isSender: false,
 							timestamp: new Date(),
+							_id: payload?.id || uuidv4(),
 						},
 					] as Message[]
 			);
@@ -90,7 +93,7 @@ const Chat = () => {
 					},
 				}
 			).then((res) => {
-				const { conversations } = res.data?.result;
+				const { conversations, totalPage } = res.data?.result;
 				const prevConversations = conversations.map((conversation) => {
 					return {
 						content: conversation.content,
@@ -98,18 +101,29 @@ const Chat = () => {
 						timestamp: new Date(conversation.updated_at),
 					};
 				});
-				setMessages([...prevConversations] as Message[]);
+				setMessages([...prevConversations.reverse()] as Message[]);
+				setTotalPage(totalPage);
+
+				// Immediate scroll to bottom after initial load
+				setTimeout(() => {
+					scrollToBottom(false); // Use immediate scroll for initial load
+				}, 0);
 			});
 		}
 	}, [recipient?._id]);
 
 	// useEffect(() => {
 	// 	// Scroll to bottom when messages change
-	// 	scrollToBottom();
+	// 	if (messages.length > 0) {
+	// 		scrollToBottom(true);
+	// 	}
 	// }, [messages]);
 
-	const scrollToBottom = () => {
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+	// Modify the scrollToBottom function to accept a parameter for smooth scrolling
+	const scrollToBottom = (smooth = false) => {
+		messagesEndRef.current?.scrollIntoView({
+			behavior: smooth ? "smooth" : "auto",
+		});
 	};
 
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -118,13 +132,11 @@ const Chat = () => {
 
 		setValue("");
 		// Send event
-		socket.emit("private message", {
-			content: value,
-			from: {
-				_id: profile?._id,
-			},
-			to: {
-				_id: recipient?._id!,
+		socket.emit("send_message", {
+			payload: {
+				content: value,
+				sender_id: profile?._id,
+				receiver_id: recipient?._id,
 			},
 		});
 
@@ -136,10 +148,11 @@ const Chat = () => {
 						content: value,
 						isSender: true,
 						timestamp: new Date(),
+						_id: uuidv4(),
 					},
 				] as Message[]
 		);
-		scrollToBottom();
+		scrollToBottom(true);
 	};
 
 	const formatTime = (date?: Date) => {
@@ -157,6 +170,35 @@ const Chat = () => {
 			setRecipient(res.data?.result);
 			alert(`Chatting with ${username}`);
 		});
+	};
+
+	const fetchMoreMessages = () => {
+		if (recipient?._id && page < totalPage) {
+			http.get<ISuccessResponseApi<ConversationResponse>>(
+				"conversation/receiver/" + recipient?._id,
+				{
+					params: {
+						page: page + 1,
+						limit: limit,
+					},
+				}
+			).then((res) => {
+				const { conversations, page, totalPage } = res.data?.result;
+				const conversationsData = conversations.map((conversation) => {
+					return {
+						content: conversation.content,
+						isSender: conversation.sender_id === profile?._id,
+						timestamp: new Date(conversation.updated_at),
+					};
+				});
+				setMessages([
+					...conversationsData.reverse(),
+					...messages,
+				] as Message[]);
+				setPage(page);
+				setTotalPage(totalPage);
+			});
+		}
 	};
 
 	return (
@@ -209,48 +251,75 @@ const Chat = () => {
 				</button>
 			</header>
 
-			{/* Messages */}
-			<div className="flex-1 space-y-3 overflow-y-auto p-4">
-				{messages.length === 0 ? (
-					<div className="flex h-full flex-col items-center justify-center text-gray-500">
-						<p className="text-center">No messages yet</p>
-						<p className="text-center text-sm">
-							Send a message to start the conversation
-						</p>
-					</div>
-				) : (
-					messages.map((message: Message) => (
-						<div
-							key={uuidv4()}
-							className={`flex ${
-								message.isSender
-									? "justify-end"
-									: "justify-start"
-							}`}
-						>
-							<div
-								className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-									message.isSender
-										? "rounded-tr-none bg-blue-500 text-white"
-										: "rounded-tl-none bg-gray-100 text-gray-900"
-								}`}
-							>
-								<p className="break-words">{message.content}</p>
-								<p
-									className={`mt-1 text-xs ${
-										message.isSender
-											? "text-blue-100"
-											: "text-gray-500"
-									}`}
-								>
-									{formatTime(message.timestamp)}
+			<div
+				id="scrollableDiv"
+				style={{
+					height: "800px",
+					overflow: "auto",
+					display: "flex",
+					flexDirection: "column-reverse",
+				}}
+			>
+				{/*Put the scroll bar always on the bottom*/}
+				<InfiniteScroll
+					dataLength={messages?.length}
+					next={fetchMoreMessages}
+					style={{ display: "flex", flexDirection: "column-reverse" }} //To put endMessage and loader to the top.
+					inverse={true} //
+					hasMore={page < totalPage}
+					loader={
+						<h4 className="text-center text-gray-500">
+							Loading...
+						</h4>
+					}
+					scrollableTarget="scrollableDiv"
+				>
+					<div className="space-y-3 p-4">
+						{messages.length === 0 ? (
+							<div className="flex h-full flex-col items-center justify-center text-gray-500">
+								<p className="text-center">No messages yet</p>
+								<p className="text-center text-sm">
+									Send a message to start the conversation
 								</p>
 							</div>
-						</div>
-					))
-				)}
-				<div ref={messagesEndRef} />
+						) : (
+							messages.map((message: Message) => (
+								<div
+									key={message?._id}
+									className={`flex ${
+										message.isSender
+											? "justify-end"
+											: "justify-start"
+									}`}
+								>
+									<div
+										className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+											message.isSender
+												? "rounded-tr-none bg-blue-500 text-white"
+												: "rounded-tl-none bg-gray-100 text-gray-900"
+										}`}
+									>
+										<p className="break-words">
+											{message.content}
+										</p>
+										<p
+											className={`mt-1 text-xs ${
+												message.isSender
+													? "text-blue-100"
+													: "text-gray-500"
+											}`}
+										>
+											{formatTime(message.timestamp)}
+										</p>
+									</div>
+								</div>
+							))
+						)}
+						<div ref={messagesEndRef} />
+					</div>
+				</InfiniteScroll>
 			</div>
+			{/* Messages */}
 
 			{/* Input */}
 			<div className="border-t border-gray-200 p-3">
